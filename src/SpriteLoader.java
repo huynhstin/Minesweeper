@@ -1,3 +1,7 @@
+/**
+ * Loads sprites for Minesweeper UI
+ * @author justin
+ */
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
@@ -9,11 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 
-/**
- * Loads sprites for Minesweeper UI
- * TODO: make methods static
- * @author justin
- */
 class SpriteLoader {
     private BufferedImage tileSheet;
     private BufferedImage numSheet;
@@ -111,7 +110,7 @@ class SpriteLoader {
         int height = numDimensions[0];
         int width = numDimensions[1];
 
-        // Only one row, so ignore that
+        // Only one row, so ignore rows
         int cols = numGrouping[1];
 
         numSprites = new BufferedImage[cols];
@@ -125,7 +124,7 @@ class SpriteLoader {
         int height = faceDimensions[0];
         int width = faceDimensions[1];
 
-        // Only one row, so ignore that
+        // Only one row, so ignore rows
         int cols = faceGrouping[1];
 
         faceSprites = new BufferedImage[cols];
@@ -139,15 +138,15 @@ class SpriteLoader {
     /**
      * Return tile sprite
      * @param num index to get from:
-     *            0-1: normal, revealed (pushed down) /
-     *            2: flagged /
-     *            3-4: normal, revealed (pushed down) ?s /
-     *            5-7: bombs: normal, red bg, red x /
+     *            0-1: normal, revealed (pushed down)
+     *            2: flagged
+     *            3-4: normal, revealed (pushed down) ?s
+     *            5-7: bombs: normal, red bg, red x
      *            8-15: numbers (subtract 7):
      *                  e.g. 8 gets 1, 9 gets 2, etc
      * @return image of tile at that index
      */
-    public  BufferedImage getTileSprite(int num) {
+    BufferedImage getTileSprite(int num) {
         return tileSprites[num];
     }
 
@@ -157,38 +156,37 @@ class SpriteLoader {
      *            0 gets 0, 1 gets 1, etc
      * @return image of that number
      */
-    public BufferedImage getNumberSprite(int num) {
+    BufferedImage getNumberSprite(int num) {
         return numSprites[num];
     }
 
     /**
      * Return face sprite
      * @param num index to get it from:
-     *            0 = smiley /
-     *            1 = smiley (pressed down) /
-     *            2 = :o /
-
-     *            3 = sunglasses /
+     *            0 = smiley
+     *            1 = smiley (pressed down)
+     *            2 = :o
+     *            3 = sunglasses
      *            4 = dead
      * @return button image
      */
-    public BufferedImage getFaceSprite(int num) {
+    BufferedImage getFaceSprite(int num) {
         return faceSprites[num];
     }
 
-    public Image getIcon() {
+    Image getIcon() {
         return icon;
     }
 
-    public int[] getTileDimensions() {
+    int[] getTileDimensions() {
         return tileDimensions;
     }
 
-    public int[] getNumDimensions() {
+    int[] getNumDimensions() {
         return numDimensions;
     }
 
-    public  int[] getFaceDimensions() {
+    int[] getFaceDimensions() {
         return faceDimensions;
     }
 }

@@ -1,16 +1,14 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-
 /**
  * Logic for Minesweeper
- * TODO: no bombs on first click. Reuse generate method and madeFirstMove bool
- * TODO: custom difficulty enum
  * @author justin
  */
+
+import java.util.ArrayList;
+import java.util.Random;
+
 class Minesweeper {
     enum Difficulty {
-        EASY, MEDIUM, HARD, CUSTOM
+        EASY, MEDIUM, HARD
     }
 
     private int rows;
@@ -19,7 +17,7 @@ class Minesweeper {
     private int flagsLeft;
     private int revealed = 0;
     private Cell[][] board;
-    private int[][] mineLocations; // probably remove
+    private int[][] mineLocations;
     private boolean dead = false;
     private boolean madeFirstMove = false;
     private boolean won = false;
@@ -29,7 +27,7 @@ class Minesweeper {
 
     /* This list holds the coordinates of all the Cells that have changed
      state, to avoid having to repaint all of the Cells on each click. */
-    ArrayList<int[]> changedList = new ArrayList<>();
+    private ArrayList<int[]> changedList = new ArrayList<>();
     Minesweeper(Difficulty diff) {
         switch (diff) {
             case EASY:
@@ -47,8 +45,6 @@ class Minesweeper {
                 cols = 30;
                 mines = 99;
                 break;
-            case CUSTOM:
-                break;
         }
         board = new Cell[rows][cols];
         mineLocations = new int[mines][2];
@@ -57,41 +53,11 @@ class Minesweeper {
         lastClickedCell = board[0][0]; // doesn't matter; will update on first click
     }
 
-    public void printMines() {
-        for (int[] coords : mineLocations) {
-            System.out.printf("(%d, %d)\n", coords[0] + 1, coords[1] + 1);
-        }
-        System.out.println("********");
-    }
-
-    void customSize(int r, int c, int mines) {
-        final int maxRows = 50;
-        final int maxCols = 99;
-        final int maxMines = 999;
-
-        this.rows = r;
-        this.cols = c;
-        this.mines = mines;
-
-        if (r > maxRows) {
-            rows = maxRows;
-        }
-        if (c > maxCols) {
-            cols = maxCols;
-        }
-        if (mines > maxMines) {
-            this.mines = maxMines;
-        }
-        if (this.mines > (r * c) - 1) {
-            this.mines = (r * c) - 1;
-        }
-    }
-
-    public int getFlagsLeft() {
+    int getFlagsLeft() {
         return flagsLeft;
     }
 
-    public void flag(int r, int c) {
+    void flag(int r, int c) {
         /* Only flagCell if you have flags left, or if the cell you are trying to
            flagCell is already flagged, meaning that you are trying to toggle. */
         if (flagsLeft > 0 || board[r][c].getState() == Cell.State.FLAGGED) {
@@ -99,11 +65,11 @@ class Minesweeper {
         }
     }
 
-    public Cell getPrevLastClicked() {
+    Cell getPrevLastClicked() {
         return lastClickedCell;
     }
 
-    public void setLastClickedCell(Cell cell) {
+    void setLastClickedCell(Cell cell) {
         lastClickedCell = cell;
     }
 
@@ -173,6 +139,7 @@ class Minesweeper {
 
     void move(int r, int c) {
         if (!dead && !won) {
+
             // only move if if it's within bound (for recursive calls), and if it's currently hidden or marked
             if (inBound(r, c) && (board[r][c].getState() == Cell.State.HIDDEN ||
                                        board[r][c].getState() == Cell.State.MARKED)) {
@@ -260,23 +227,23 @@ class Minesweeper {
         }
     }
 
-    public void toggleMarkOption() {
+    void toggleMarkOption() {
         this.markOption = !this.markOption;
     }
 
-    public void setMarkOption(boolean markOption) {
+    void setMarkOption(boolean markOption) {
         this.markOption = markOption;
     }
 
-    public boolean isMarkOption() {
+    boolean isMarkOption() {
         return markOption;
     }
 
-    public int getRows() {
+    int getRows() {
         return rows;
     }
 
-    public int getCols() {
+    int getCols() {
         return cols;
     }
 }

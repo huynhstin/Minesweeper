@@ -1,12 +1,12 @@
-
-import java.awt.image.BufferedImage;
-
 /**
- * com.justin.Cell object
+ * Cell object
  * Tiles have a value between -1 and 8:
  * -1 for bombs, 0 for empty, 1-8 for a numbered tile
  * @author justin
  */
+
+import java.awt.image.BufferedImage;
+
 class Cell {
     enum State {
         HIDDEN, FLAGGED, REVEALED, MARKED
@@ -24,16 +24,12 @@ class Cell {
         return state;
     }
 
-    public void setState(final State state) {
+    void setState(final State state) {
         this.state = state;
     }
 
     void makeMine() {
         value = -1;
-    }
-
-    void makeEmpty() {
-        value = 0;
     }
 
     boolean isMine() {
@@ -73,7 +69,7 @@ class Cell {
         }
     }
 
-    public void setLastClicked(boolean lastClicked) {
+    void setLastClicked(boolean lastClicked) {
         this.lastClicked = lastClicked;
     }
 

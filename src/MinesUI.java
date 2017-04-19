@@ -3,13 +3,42 @@
  * @author justin
  */
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+
+import java.awt.image.BufferedImage;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import java.net.URL;
+
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.net.URL;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class MinesUI {
     private SpriteLoader s = new SpriteLoader();
@@ -19,17 +48,15 @@ public class MinesUI {
     private JButton faceButton = new JButton();
     private JPanel topPanel;
     private Dimension windowSize; // gets updated in constructor
-    private Point location;
     private DigClock clock = new DigClock();
     private FlagTicker flagger;
     private Grid grid;
     private final Color background = new Color(192, 192, 192);
     private JCheckBoxMenuItem marksOn;
 
-    public MinesUI(Minesweeper.Difficulty gameDiff) {
+    private MinesUI(Minesweeper.Difficulty gameDiff) {
         this.gameDiff = gameDiff;
         game = new Minesweeper(gameDiff);
-        game.printMines();
         flagger = new FlagTicker();
         switch (gameDiff) {
             case EASY:
@@ -61,13 +88,6 @@ public class MinesUI {
         frame.setLocationRelativeTo(null);
         frame.setIconImage(s.getIcon());
 
-        location = frame.getLocation();
-        frame.addComponentListener(new ComponentAdapter() {
-            public void componentMoved(ComponentEvent e) {
-                location = frame.getLocationOnScreen();
-            }
-        });
-
         /* Menu */
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBackground(new Color(236, 233, 216));
@@ -86,15 +106,13 @@ public class MinesUI {
         medOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.MEDIUM));
         JMenuItem hardOption = new JMenuItem("Expert");
         hardOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.HARD));
-        JMenuItem customOption = new JMenuItem("Custom");
-        customOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.CUSTOM));
 
         JSeparator separatorTwo = new JSeparator();
         separatorTwo.setPreferredSize(new Dimension(0, 1));
 
         marksOn = new JCheckBoxMenuItem("Marks (?)");
         marksOn.addActionListener(e -> game.toggleMarkOption());
-        marksOn.setHorizontalTextPosition(JMenuItem.LEFT);
+        marksOn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
 
         JSeparator separatorThree = new JSeparator();
         separatorThree.setPreferredSize(new Dimension(0, 1));
@@ -107,7 +125,6 @@ public class MinesUI {
         menu.add(easyOption);
         menu.add(medOption);
         menu.add(hardOption);
-        menu.add(customOption);
         menu.add(separatorTwo);
         menu.add(marksOn);
         menu.add(separatorThree);
@@ -115,7 +132,7 @@ public class MinesUI {
         menuBar.add(menu);
 
         JMenu help = new JMenu("Help");
-        JMenuItem link = new JMenuItem("How to Play...  ");
+        JMenuItem link = new JMenuItem("How to Play");
         link.addActionListener(event -> {
             try {
                 Desktop.getDesktop().browse(new URL("http://www.minesweeper.info/wiki/Strategy").toURI());
@@ -125,25 +142,15 @@ public class MinesUI {
         });
         link.setToolTipText("Will open browser.");
 
-        JMenuItem about = new JMenuItem("View Source...   ");
-        about.addActionListener(event -> {
-            try {
-                Desktop.getDesktop().browse(new URL("http://github.com/huynhstin").toURI());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        about.setToolTipText("Will open browser.");
-
         help.add(link);
-        help.add(about);
         menuBar.add(help);
         frame.setJMenuBar(menuBar);
 
         /* Button */
         faceButton.addActionListener(actionEvent -> reset());
         faceButton.setContentAreaFilled(false);
-        faceButton.setPreferredSize(new Dimension(40, 40));
+        faceButton.setPreferredSize(new Dimension(s.getFaceDimensions()[0],
+                                    s.getFaceDimensions()[1]));
         faceButton.setFocusable(false);
         faceButton.setBorder(null);
         faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
@@ -189,34 +196,22 @@ public class MinesUI {
         frame.pack();
     }
 
-    void showCustomSizer() {
-
-    }
-
     /**
-     * TODO: On reset, save old location, marks option to text file
+     * Note that this method throws away user's mark option;
+     *  it will have to be turned back on manually.
      * @param gameDiff new difficulty of game
      */
     private void resetNewDiff(Minesweeper.Difficulty gameDiff) {
-        boolean marks = game.isMarkOption();
         if (gameDiff == this.gameDiff) {
             return;
-        } else if (gameDiff == Minesweeper.Difficulty.CUSTOM) {
-            //TODO: add custom capability
         }
-        Point newLocation = new Point(this.location);
         frame.dispose();
         new MinesUI(gameDiff);
-        game.setMarkOption(marks);
-        marksOn.setState(marks);
-        frame.setLocation(newLocation);
     }
 
     private void reset() {
         boolean marks = game.isMarkOption();
         game = new Minesweeper(gameDiff);
-
-        game.printMines();
 
         game.setMarkOption(marks);
         flagger.updateFlags();
@@ -241,12 +236,10 @@ public class MinesUI {
             clock.endTimer();
             faceButton.setIcon(new ImageIcon(s.getFaceSprite(4)));
             grid.repaint();
-            // TODO: reveal everything
         } else if (game.checkWin()) {
             faceButton.setIcon(new ImageIcon(s.getFaceSprite(3)));
             clock.endTimer();
             grid.updateImgs();
-            game.clearChangedList();
         }
     }
 
@@ -257,7 +250,6 @@ public class MinesUI {
         private JLabel[] timeLabels = new JLabel[digits];
         private Timer t;
 
-        // TODO: optimize; don't redraw the same digits over and over when not needed
         DigClock() {
             super();
             this.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -284,17 +276,17 @@ public class MinesUI {
             });
         }
 
-        public void startTimer() {
+        void startTimer() {
             started = true;
             t.start();
         }
 
-        public void endTimer() {
+        void endTimer() {
             started = false;
             t.stop();
         }
 
-        public boolean isStarted() {
+        boolean isStarted() {
             return started;
         }
 
@@ -354,10 +346,6 @@ public class MinesUI {
             createBoard();
         }
 
-        Square[][] getCells() {
-            return cells;
-        }
-
         void createBoard() {
             setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
@@ -395,15 +383,6 @@ public class MinesUI {
             }
             game.clearChangedList();
         }
-
-        // TODO: add chording functionality
-        void revealAround(int r, int c) {
-            cells[r][c].repaint();
-        }
-
-        boolean inBounds(int r, int c) {
-            return r >= 0 && r < this.rows && c >= 0 && c < this.cols;
-        }
     }
 
     public class Square extends JComponent {
@@ -412,16 +391,13 @@ public class MinesUI {
         private boolean selected = false;
 
         /* This boolean is used to make sure mouse is still down,
-        so it doesn't create mouse drag trails when painting
-        the pushed-down sprite. */
-        // TODO: fix this functionality
+        so it knows to release the selected sprite. */
         private boolean mouseDown = false;
 
         private Square(int row, int col) {
             this.row = row;
             this.col = col;
             this.addMouseListener(new MouseAdapter() {
-                // TODO: fix flags, add ? capability
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (!game.isDead() && !game.getWon()) {
@@ -440,9 +416,7 @@ public class MinesUI {
 
                             faceButton.setIcon(new ImageIcon(s.getFaceSprite(2)));
                         } else if (SwingUtilities.isMiddleMouseButton(e)) {
-                            // TODO: chords (reveal in grid around)
                             faceButton.setIcon(new ImageIcon(s.getFaceSprite(2)));
-                            //grid.revealAround(row, col);
                         }
                     }
                     repaint();
@@ -476,15 +450,6 @@ public class MinesUI {
 
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    //System.out.println(game.getBoard()[row][col].getState());
-                    if (mouseDown) {
-                        selected = true;
-                        repaint();
-                    }
-                }
-
-                @Override
-                public void mouseDragged(MouseEvent e) {
                     if (mouseDown) {
                         selected = true;
                         repaint();
@@ -493,15 +458,6 @@ public class MinesUI {
             });
         }
 
-        /**
-         * If dead:
-         *  - if tile is flagged
-         *      - if it was a bomb, keep it flagged
-         *      - else, draw red X bomb
-         * If pushed in:
-         *  - if marked, draw pushed in marked sprite
-         *  - if it's anything but flagged or revealed, draw pushed in sprite
-         */
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -509,8 +465,7 @@ public class MinesUI {
             Cell cell = game.getBoard()[row][col];
             BufferedImage tileImg = cell.getImg();
             if (game.isDead()) {
-                // if you flagged it, but you're dead and it wasn't a mine
-                if (cell.getState() == Cell.State.FLAGGED) { // TODO: make sure this works
+                if (cell.getState() == Cell.State.FLAGGED) {
                     if (cell.isMine()) {
                         tileImg = s.getTileSprite(2);
                     } else {
