@@ -1,6 +1,6 @@
 /**
  * Logic for Minesweeper
- * @author justin
+ * @author huynhstin
  */
 
 import java.util.ArrayList;

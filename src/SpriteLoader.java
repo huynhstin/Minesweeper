@@ -1,12 +1,10 @@
 /**
  * Loads sprites for Minesweeper UI
- * @author justin
+ * @author huynhstin
  */
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -34,12 +32,6 @@ class SpriteLoader {
     private int[] faceDimensions;
 
     SpriteLoader() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException |
-                IllegalAccessException | UnsupportedLookAndFeelException e) {
-        }
-
         try {
             URL tileURL = getClass().getClassLoader().getResource("sprites/tiles.png");
             URL numURL = getClass().getClassLoader().getResource("sprites/clock.png");

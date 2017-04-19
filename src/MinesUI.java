@@ -1,6 +1,6 @@
 /**
  * GUI for Minesweeper game
- * @author justin
+ * @author huynhstin
  */
 
 import java.awt.BorderLayout;
@@ -52,7 +52,6 @@ public class MinesUI {
     private FlagTicker flagger;
     private Grid grid;
     private final Color background = new Color(192, 192, 192);
-    private JCheckBoxMenuItem marksOn;
 
     private MinesUI(Minesweeper.Difficulty gameDiff) {
         this.gameDiff = gameDiff;
@@ -110,7 +109,7 @@ public class MinesUI {
         JSeparator separatorTwo = new JSeparator();
         separatorTwo.setPreferredSize(new Dimension(0, 1));
 
-        marksOn = new JCheckBoxMenuItem("Marks (?)");
+        JCheckBoxMenuItem marksOn = new JCheckBoxMenuItem("Marks (?)");
         marksOn.addActionListener(e -> game.toggleMarkOption());
         marksOn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
 

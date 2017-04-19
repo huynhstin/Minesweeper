@@ -2,7 +2,7 @@
  * Cell object
  * Tiles have a value between -1 and 8:
  * -1 for bombs, 0 for empty, 1-8 for a numbered tile
- * @author justin
+ * @author huynhstin
  */
 
 import java.awt.image.BufferedImage;
@@ -75,7 +75,7 @@ class Cell {
 
     /**
      * Returns basic images associated with each cell.
-     * This oes not return images that rely on game state
+     * This does not return images that rely on game state
      *  (e.g. dead/alive, click state): this is delegated to MinesUI.
      * @return image of cell
      */
