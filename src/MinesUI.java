@@ -53,7 +53,7 @@ public class MinesUI {
     private final Color background = new Color(192, 192, 192);
 
     private MinesUI() {
-        game = new Minesweeper(Minesweeper.Difficulty.EASY);
+        game = new Minesweeper(Minesweeper.Difficulty.BEGINNER);
         flagger = new FlagTicker();
         initDim(game.getDiff());
         init();
@@ -62,13 +62,13 @@ public class MinesUI {
 
     private void initDim(Minesweeper.Difficulty gameDiff) {
         switch (gameDiff) {
-            case EASY:
+            case BEGINNER:
                 windowSize = new Dimension(135, 180);
                 break;
-            case MEDIUM:
+            case INTERMEDIATE:
                 windowSize = new Dimension(300, 350);
                 break;
-            case HARD:
+            case EXPERT:
                 windowSize = new Dimension(450, 350);
                 break;
         }
@@ -102,18 +102,18 @@ public class MinesUI {
         separatorOne.setPreferredSize(new Dimension(0, 1));
 
         JMenuItem easyOption = new JMenuItem("Beginner");
-        easyOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.EASY));
+        easyOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.BEGINNER));
         JMenuItem medOption = new JMenuItem("Intermediate");
-        medOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.MEDIUM));
+        medOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.INTERMEDIATE));
         JMenuItem hardOption = new JMenuItem("Expert");
-        hardOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.HARD));
+        hardOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.EXPERT));
 
         JSeparator separatorTwo = new JSeparator();
         separatorTwo.setPreferredSize(new Dimension(0, 1));
 
         JCheckBoxMenuItem marksOn = new JCheckBoxMenuItem("Marks (?)");
         marksOn.addActionListener(e -> game.toggleMarkOption());
-        marksOn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0));
+        marksOn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, 0));
 
         JSeparator separatorThree = new JSeparator();
         separatorThree.setPreferredSize(new Dimension(0, 1));
@@ -247,7 +247,7 @@ public class MinesUI {
         grid.updateImgs();
     }
 
-    private void checkDead() {
+    private void endGameCheck() {
         if (game.isDead()) {
             game.revealOnDead();
             clock.endTimer();
@@ -454,7 +454,7 @@ public class MinesUI {
                             repaint();
                             selected = false;
                         }
-                        checkDead();
+                        endGameCheck();
                     }
                 }
 

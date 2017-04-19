@@ -8,7 +8,7 @@ import java.util.Random;
 
 class Minesweeper {
     enum Difficulty {
-        EASY, MEDIUM, HARD
+        BEGINNER, INTERMEDIATE, EXPERT
     }
 
     private int rows;
@@ -32,17 +32,17 @@ class Minesweeper {
     Minesweeper(Difficulty diff) {
         this.diff = diff;
         switch (diff) {
-            case EASY:
+            case BEGINNER:
                 rows = 9;
                 cols = 9;
                 mines = 10;
                 break;
-            case MEDIUM:
+            case INTERMEDIATE:
                 rows = 16;
                 cols = 16;
                 mines = 40;
                 break;
-            case HARD:
+            case EXPERT:
                 rows = 16;
                 cols = 30;
                 mines = 99;
