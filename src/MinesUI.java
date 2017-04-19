@@ -42,7 +42,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class MinesUI {
     private SpriteLoader s = new SpriteLoader();
-    private Minesweeper.Difficulty gameDiff;
     private Minesweeper game;
     private JFrame frame = new JFrame();
     private JButton faceButton = new JButton();
@@ -53,10 +52,15 @@ public class MinesUI {
     private Grid grid;
     private final Color background = new Color(192, 192, 192);
 
-    private MinesUI(Minesweeper.Difficulty gameDiff) {
-        this.gameDiff = gameDiff;
-        game = new Minesweeper(gameDiff);
+    private MinesUI() {
+        game = new Minesweeper(Minesweeper.Difficulty.EASY);
         flagger = new FlagTicker();
+        initDim(game.getDiff());
+        init();
+        frame.setVisible(true);
+    }
+
+    private void initDim(Minesweeper.Difficulty gameDiff) {
         switch (gameDiff) {
             case EASY:
                 windowSize = new Dimension(135, 180);
@@ -68,8 +72,6 @@ public class MinesUI {
                 windowSize = new Dimension(450, 350);
                 break;
         }
-        init();
-        frame.setVisible(true);
     }
 
     private void init() {
@@ -188,7 +190,6 @@ public class MinesUI {
         topPanel.setBackground(background);
 
         grid = new Grid();
-        grid.setBorder(new EmptyBorder(10, 15, 15, 15));
 
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(grid);
@@ -196,21 +197,21 @@ public class MinesUI {
     }
 
     /**
-     * Note that this method throws away user's mark option;
-     *  it will have to be turned back on manually.
+     * Reset game with a new difficulty setting
      * @param gameDiff new difficulty of game
      */
     private void resetNewDiff(Minesweeper.Difficulty gameDiff) {
-        if (gameDiff == this.gameDiff) {
+        // Don't do anything if we're already at that difficulty.
+        if (gameDiff == game.getDiff()) {
             return;
         }
-        frame.dispose();
-        new MinesUI(gameDiff);
-    }
 
-    private void reset() {
         boolean marks = game.isMarkOption();
         game = new Minesweeper(gameDiff);
+
+        frame.remove(grid);
+        grid = new Grid();
+        frame.add(grid);
 
         game.setMarkOption(marks);
         flagger.updateFlags();
@@ -218,13 +219,30 @@ public class MinesUI {
         topPanel.remove(clock);
         clock = new DigClock();
         topPanel.add(clock);
-        topPanel.revalidate();
-        topPanel.repaint();
+
+        faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
+
+        initDim(gameDiff);
+        frame.setMinimumSize(new Dimension(this.windowSize));
+
+        frame.revalidate();
+        frame.pack();
+    }
+
+    private void reset() {
+        boolean marks = game.isMarkOption();
+        game = new Minesweeper(game.getDiff());
+
+        game.setMarkOption(marks);
+        flagger.updateFlags();
+
+        topPanel.remove(clock);
+        clock = new DigClock();
+        topPanel.add(clock);
 
         faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
 
         frame.revalidate();
-        frame.repaint();
         grid.repaint();
         grid.updateImgs();
     }
@@ -343,6 +361,7 @@ public class MinesUI {
             cols = game.getDim()[1];
             this.setBackground(background);
             createBoard();
+            this.setBorder(new EmptyBorder(10, 15, 15, 15));
         }
 
         void createBoard() {
@@ -492,7 +511,6 @@ public class MinesUI {
     }
 
     public static void main(String[] args) {
-        // Default difficulty is easy
-        SwingUtilities.invokeLater(() -> new MinesUI(Minesweeper.Difficulty.EASY));
+        SwingUtilities.invokeLater(MinesUI :: new);
     }
 }

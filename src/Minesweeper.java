@@ -24,11 +24,13 @@ class Minesweeper {
     private Random randy = new Random();
     private Cell lastClickedCell;
     private boolean markOption = false;
+    private Difficulty diff;
 
     /* This list holds the coordinates of all the Cells that have changed
      state, to avoid having to repaint all of the Cells on each click. */
     private ArrayList<int[]> changedList = new ArrayList<>();
     Minesweeper(Difficulty diff) {
+        this.diff = diff;
         switch (diff) {
             case EASY:
                 rows = 9;
@@ -63,6 +65,10 @@ class Minesweeper {
         if (flagsLeft > 0 || board[r][c].getState() == Cell.State.FLAGGED) {
             flagsLeft += board[r][c].flagCell(markOption);
         }
+    }
+
+    Difficulty getDiff() {
+        return this.diff;
     }
 
     Cell getPrevLastClicked() {
