@@ -67,8 +67,6 @@ public class MinesUI {
         frame.setResizable(false);
         frame.setTitle("Minesweeper");
         frame.setBackground(background);
-        frame.setLocationRelativeTo(null);
-        frame.setIconImage(loader.getIcon());
 
         /* Menu */
         JMenuBar menuBar = new JMenuBar();
@@ -196,6 +194,8 @@ public class MinesUI {
         game = new Minesweeper(gameDiff);
 
         frame.remove(grid);
+        grid.killAll();
+        grid.removeAll();
         grid = new Grid();
         frame.add(grid);
 
@@ -210,11 +210,13 @@ public class MinesUI {
 
         frame.revalidate();
         frame.pack();
+        frame.setLocationRelativeTo(null);
     }
 
     private void reset() {
         boolean marks = game.isMarkOption();
-        game = new Minesweeper(game.getDiff());
+        Minesweeper.Difficulty diff = game.getDiff();
+        game = new Minesweeper(diff);
 
         game.setMarkOption(marks);
         flagger.updateFlags();
@@ -390,6 +392,14 @@ public class MinesUI {
                 cells[coords[0]][coords[1]].repaint();
             }
             game.clearChangedList();
+        }
+
+        void killAll() {
+            for (int r = 0; r < this.rows; r++) {
+                for (int c = 0; c < this.cols; c++) {
+                    cells[r][c].removeAll();
+                }
+            }
         }
     }
 

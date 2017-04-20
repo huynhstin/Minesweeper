@@ -9,22 +9,19 @@
     <bookmark url="file://$PROJECT_DIR$/src/MinesUI.java" line="47" mnemonic="2" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b2da5e9c-150f-485b-bbc7-6675e1e25433" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$2.class" afterPath="" />
+    <list default="true" id="b2da5e9c-150f-485b-bbc7-6675e1e25433" name="Default" comment="fixed frame centering">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/artifacts/Minesweeper/Minesweeper.jar" afterPath="$PROJECT_DIR$/out/artifacts/Minesweeper/Minesweeper.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$1.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/Cell$1.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/Cell$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/Cell.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/Cell.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$DigClock.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$DigClock.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$FlagTicker.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$FlagTicker.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$Grid.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$Grid.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$Square$1.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$Square$1.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$Square.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI$Square.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/MinesUI.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/Minesweeper$1.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/Minesweeper$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/Minesweeper$Difficulty.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/Minesweeper$Difficulty.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/Minesweeper/Minesweeper.class" afterPath="$PROJECT_DIR$/out/production/Minesweeper/Minesweeper.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Cell.java" afterPath="$PROJECT_DIR$/src/Cell.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/MinesUI.java" afterPath="$PROJECT_DIR$/src/MinesUI.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Minesweeper.java" afterPath="$PROJECT_DIR$/src/Minesweeper.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -46,8 +43,8 @@
       <file leaf-file-name="MinesUI.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/MinesUI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="469" column="9" lean-forward="true" selection-start-line="469" selection-start-column="9" selection-end-line="469" selection-end-column="9" />
+            <state relative-caret-position="-162">
+              <caret line="224" column="0" lean-forward="false" selection-start-line="224" selection-start-column="0" selection-end-line="224" selection-end-column="0" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -59,8 +56,8 @@
       <file leaf-file-name="Cell.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Cell.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1692">
-              <caret line="106" column="1" lean-forward="true" selection-start-line="106" selection-start-column="1" selection-end-line="106" selection-end-column="1" />
+            <state relative-caret-position="1602">
+              <caret line="106" column="1" lean-forward="false" selection-start-line="106" selection-start-column="1" selection-end-line="106" selection-end-column="1" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -72,7 +69,7 @@
         <entry file="file://$PROJECT_DIR$/src/Minesweeper.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -91,7 +88,7 @@
       <file leaf-file-name="SpriteLoader.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/SpriteLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="18">
+            <state relative-caret-position="738">
               <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
@@ -119,7 +116,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>getwon</find>
       <find>flagged</find>
       <find>else {</find>
       <find>updateimgs</find>
@@ -149,6 +145,7 @@
       <find>clearchang</find>
       <find>toppanel</find>
       <find>else</find>
+      <find>frame.setrela</find>
     </findStrings>
     <replaceStrings>
       <replace>h</replace>
@@ -183,6 +180,7 @@
         <option value="$PROJECT_DIR$/src/SpriteLoader.java" />
         <option value="$PROJECT_DIR$/src/Minesweeper.java" />
         <option value="$PROJECT_DIR$/src/Cell.java" />
+        <option value="$USER_HOME$/.IdeaIC2017.1/idea64.vmoptions" />
         <option value="$PROJECT_DIR$/src/MinesUI.java" />
       </list>
     </option>
@@ -208,9 +206,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -301,6 +296,9 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -683,7 +681,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492585047726</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="clean up">
+      <created>1492662586995</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1492662586995</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TodoView">
@@ -701,12 +706,11 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32921812" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32921812" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="940" y="231" width="825" height="421" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35699588" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -714,7 +718,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16614583" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16614583" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -725,6 +729,7 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="940" y="231" width="825" height="421" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32991803" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -767,13 +772,14 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added screenshot" />
-    <MESSAGE value="clean up" />
     <MESSAGE value="remove wildcard imports &#10;more code clean up" />
     <MESSAGE value="remove wildcard imports &#10;more code clean up&#10;update to fit style" />
     <MESSAGE value="remove useless imports" />
     <MESSAGE value="update resetter to not dispose frame" />
     <MESSAGE value="update resetter to not dispose frame&#10;changed mark accelerator to &quot;/&quot; &#10;changed difficulty states to better match" />
-    <option name="LAST_COMMIT_MESSAGE" value="update resetter to not dispose frame&#10;changed mark accelerator to &quot;/&quot; &#10;changed difficulty states to better match" />
+    <MESSAGE value="clean up" />
+    <MESSAGE value="fixed frame centering" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed frame centering" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -786,7 +792,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/justin/Minesweeper.java" />
     <entry file="file://$PROJECT_DIR$/src/com/justin/Cell.java" />
     <entry file="file://$PROJECT_DIR$/src/com/justin/MinesUI.java" />
     <entry file="file://$PROJECT_DIR$/src/com/justin/ListJavaFonts.java" />
@@ -909,7 +914,6 @@
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="0">
             <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            <folding />
           </first_editor>
           <second_editor />
         </state>
@@ -917,7 +921,6 @@
       <provider editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -938,7 +941,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/SpriteLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
+        <state relative-caret-position="738">
           <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
@@ -955,7 +958,7 @@
     <entry file="file://$PROJECT_DIR$/src/Minesweeper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
             <element signature="imports" expanded="true" />
@@ -965,18 +968,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Cell.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1692">
-          <caret line="106" column="1" lean-forward="true" selection-start-line="106" selection-start-column="1" selection-end-line="106" selection-end-column="1" />
+        <state relative-caret-position="1602">
+          <caret line="106" column="1" lean-forward="false" selection-start-line="106" selection-start-column="1" selection-end-line="106" selection-end-column="1" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.IdeaIC2017.1/idea64.vmoptions">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="2" column="6" lean-forward="false" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/MinesUI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="469" column="9" lean-forward="true" selection-start-line="469" selection-start-column="9" selection-end-line="469" selection-end-column="9" />
+        <state relative-caret-position="-162">
+          <caret line="224" column="0" lean-forward="false" selection-start-line="224" selection-start-column="0" selection-end-line="224" selection-end-column="0" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
             <element signature="imports" expanded="true" />
