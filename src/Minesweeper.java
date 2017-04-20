@@ -29,6 +29,7 @@ class Minesweeper {
     /* This list holds the coordinates of all the Cells that have changed
      state, to avoid having to repaint all of the Cells on each click. */
     private ArrayList<int[]> changedList = new ArrayList<>();
+
     Minesweeper(Difficulty diff) {
         this.diff = diff;
         switch (diff) {
@@ -226,9 +227,7 @@ class Minesweeper {
         if (dead) {
             for (int[] mineLocation : mineLocations) {
                 Cell cell = board[mineLocation[0]][mineLocation[1]];
-                if (cell.getState() != Cell.State.FLAGGED) {
-                    cell.reveal();
-                }
+                cell.reveal();
             }
         }
     }

@@ -41,37 +41,19 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class MinesUI {
-    private SpriteLoader s = new SpriteLoader();
-    private Minesweeper game;
-    private JFrame frame = new JFrame();
-    private JButton faceButton = new JButton();
-    private JPanel topPanel;
-    private Dimension windowSize; // gets updated in constructor
+    private final SpriteLoader loader = new SpriteLoader();
+    private Minesweeper game = new Minesweeper(Minesweeper.Difficulty.BEGINNER);
+    private final JFrame frame = new JFrame();
+    private final JButton faceButton = new JButton();
+    private final JPanel topPanel = new JPanel();
     private DigClock clock = new DigClock();
-    private FlagTicker flagger;
     private Grid grid;
+    private FlagTicker flagger;
     private final Color background = new Color(192, 192, 192);
 
     private MinesUI() {
-        game = new Minesweeper(Minesweeper.Difficulty.BEGINNER);
-        flagger = new FlagTicker();
-        initDim(game.getDiff());
         init();
         frame.setVisible(true);
-    }
-
-    private void initDim(Minesweeper.Difficulty gameDiff) {
-        switch (gameDiff) {
-            case BEGINNER:
-                windowSize = new Dimension(135, 180);
-                break;
-            case INTERMEDIATE:
-                windowSize = new Dimension(300, 350);
-                break;
-            case EXPERT:
-                windowSize = new Dimension(450, 350);
-                break;
-        }
     }
 
     private void init() {
@@ -81,13 +63,12 @@ public class MinesUI {
                 IllegalAccessException | UnsupportedLookAndFeelException e) {
         }
 
-        frame.setMinimumSize(new Dimension(this.windowSize));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setTitle("Minesweeper");
         frame.setBackground(background);
         frame.setLocationRelativeTo(null);
-        frame.setIconImage(s.getIcon());
+        frame.setIconImage(loader.getIcon());
 
         /* Menu */
         JMenuBar menuBar = new JMenuBar();
@@ -143,55 +124,60 @@ public class MinesUI {
         });
         link.setToolTipText("Will open browser.");
 
+        JMenuItem code = new JMenuItem("View on GitHub");
+        code.addActionListener(event -> {
+            try {
+                Desktop.getDesktop().browse(new URL("http://www.github.com/huynhstin/Minesweeper").toURI());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        code.setToolTipText("Will open browser.");
+
         help.add(link);
+        help.add(code);
         menuBar.add(help);
         frame.setJMenuBar(menuBar);
 
         /* Button */
         faceButton.addActionListener(actionEvent -> reset());
         faceButton.setContentAreaFilled(false);
-        faceButton.setPreferredSize(new Dimension(s.getFaceDimensions()[0],
-                                    s.getFaceDimensions()[1]));
+        faceButton.setPreferredSize(new Dimension(loader.getFaceDimensions()[0],
+                                    loader.getFaceDimensions()[1]));
         faceButton.setFocusable(false);
         faceButton.setBorder(null);
-        faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
+        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
         faceButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 super.mousePressed(mouseEvent);
-                faceButton.setIcon(new ImageIcon(s.getFaceSprite(1)));
+                faceButton.setIcon(new ImageIcon(loader.getFaceSprite(1)));
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 super.mouseReleased(mouseEvent);
-                faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
+                faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
             }
         });
 
         /* Panels */
-        flagger.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        flagger.setBorder(new EmptyBorder(8, 18, 0, 0));
-        flagger.setBackground(background);
 
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.PAGE_START;
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(background);
-        buttonPanel.add(faceButton, gbc);
+        buttonPanel.add(faceButton);
         buttonPanel.setBorder(null);
 
-        topPanel = new JPanel();
         topPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
         topPanel.setLayout(new GridLayout(1, 3));
+        flagger = new FlagTicker();
         topPanel.add(flagger);
         topPanel.add(buttonPanel);
         topPanel.add(clock);
         topPanel.setBackground(background);
+        frame.add(topPanel, BorderLayout.NORTH);
 
         grid = new Grid();
-
-        frame.add(topPanel, BorderLayout.NORTH);
         frame.add(grid);
         frame.pack();
     }
@@ -220,10 +206,7 @@ public class MinesUI {
         clock = new DigClock();
         topPanel.add(clock);
 
-        faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
-
-        initDim(gameDiff);
-        frame.setMinimumSize(new Dimension(this.windowSize));
+        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
 
         frame.revalidate();
         frame.pack();
@@ -240,7 +223,7 @@ public class MinesUI {
         clock = new DigClock();
         topPanel.add(clock);
 
-        faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
+        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
 
         frame.revalidate();
         grid.repaint();
@@ -251,10 +234,10 @@ public class MinesUI {
         if (game.isDead()) {
             game.revealOnDead();
             clock.endTimer();
-            faceButton.setIcon(new ImageIcon(s.getFaceSprite(4)));
+            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(4)));
             grid.repaint();
         } else if (game.checkWin()) {
-            faceButton.setIcon(new ImageIcon(s.getFaceSprite(3)));
+            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(3)));
             clock.endTimer();
             grid.updateImgs();
         }
@@ -262,7 +245,7 @@ public class MinesUI {
 
     class DigClock extends JComponent {
         private final int digits = 3;
-        private int secs = 0;
+        private int secs = 1;
         private boolean started = false;
         private JLabel[] timeLabels = new JLabel[digits];
         private Timer t;
@@ -270,24 +253,29 @@ public class MinesUI {
         DigClock() {
             super();
             this.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-            this.setBorder(new EmptyBorder(8, 0, 0, 18));
+            this.setBorder(new EmptyBorder(7, 0, 0, 15));
             this.setBackground(background);
+
             // Initialize to all 0 sprites
             for (int i = 0; i < digits; i++) {
-                timeLabels[i] = new JLabel(new ImageIcon(s.getNumberSprite(0)));
+                timeLabels[i] = new JLabel(new ImageIcon(loader.getNumberSprite(0)));
                 this.add(timeLabels[i]);
             }
+
             t = new Timer(1000, e -> {
+                String old = String.format("%03d", secs);
                 secs++;
                 if (secs >= 999) {
                     secs = 0;
                 }
+
                 String model = String.format("%03d", secs);
                 for (int i = 0; i < digits; i++) {
-                    this.remove(timeLabels[i]);
                     int digit = Character.getNumericValue(model.charAt(i));
-                    timeLabels[i].setIcon(new ImageIcon(s.getNumberSprite(digit)));
-                    this.add(timeLabels[i]);
+                    if (digit == Character.getNumericValue(old.charAt(i))) {
+                        continue; // Don't bother changing the image if it's the same digit as before.
+                    }
+                    timeLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(digit)));
                 }
                 this.repaint();
             });
@@ -295,6 +283,10 @@ public class MinesUI {
 
         void startTimer() {
             started = true;
+
+            // Make timer display "001" on first click.
+            timeLabels[2].setIcon(new ImageIcon(loader.getNumberSprite(1)));
+            this.repaint();
             t.start();
         }
 
@@ -308,14 +300,9 @@ public class MinesUI {
         }
 
         @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-        }
-
-        @Override
         public Dimension getPreferredSize() {
-            return new Dimension(s.getNumDimensions()[0],
-                    s.getNumDimensions()[1] * digits);
+            return new Dimension(loader.getNumDimensions()[0],
+                    loader.getNumDimensions()[1] * digits);
         }
     }
 
@@ -325,26 +312,29 @@ public class MinesUI {
 
         FlagTicker() {
             super();
-            // Initialize all of the labels to 0
             for (int i = 0; i < digits; i++) {
-                digitLabels[i] = new JLabel(new ImageIcon(s.getNumberSprite(0)));
+                digitLabels[i] = new JLabel();
                 this.add(digitLabels[i]);
-                this.revalidate();
             }
             updateFlags();
+            this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            this.setBorder(new EmptyBorder(7, 15, 0, 0));
+            this.setBackground(background);
         }
 
         void updateFlags() {
             String model = String.format("%03d", game.getFlagsLeft());
             for (int i = 0; i < digits; i++) {
-                this.remove(digitLabels[i]);
-                this.revalidate();
-                digitLabels[i].setIcon(new ImageIcon(s.getNumberSprite(
+                digitLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(
                         Character.getNumericValue(model.charAt(i)))));
-                this.add(digitLabels[i]);
-                this.revalidate();
             }
             this.repaint();
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(loader.getNumDimensions()[0],
+                    loader.getNumDimensions()[1] * digits);
         }
     }
 
@@ -359,9 +349,9 @@ public class MinesUI {
         Grid() {
             rows = game.getDim()[0];
             cols = game.getDim()[1];
-            this.setBackground(background);
             createBoard();
-            this.setBorder(new EmptyBorder(10, 15, 15, 15));
+            this.setBackground(background);
+            this.setBorder(new EmptyBorder(5, 10, 10, 10));
         }
 
         void createBoard() {
@@ -408,7 +398,7 @@ public class MinesUI {
         private final int col;
         private boolean selected = false;
 
-        /* This boolean is used to make sure mouse is still down,
+        /* Used to make sure mouse is still down,
         so it knows to release the selected sprite. */
         private boolean mouseDown = false;
 
@@ -427,14 +417,17 @@ public class MinesUI {
                             if (game.getBoard()[row][col].getState() != Cell.State.REVEALED) {
                                 selected = true;
                             }
-                            // last click bool for red bg bombs
-                            game.getPrevLastClicked().setLastClicked(false);
-                            game.getBoard()[row][col].setLastClicked(true);
-                            game.setLastClickedCell(game.getBoard()[row][col]);
 
-                            faceButton.setIcon(new ImageIcon(s.getFaceSprite(2)));
+                            // last click bool for red bg bombs
+                            if (game.getBoard()[row][col].isMine()) {
+                                game.getPrevLastClicked().setLastClicked(false);
+                                game.getBoard()[row][col].setLastClicked(true);
+                                game.setLastClickedCell(game.getBoard()[row][col]);
+                            }
+
+                            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(2)));
                         } else if (SwingUtilities.isMiddleMouseButton(e)) {
-                            faceButton.setIcon(new ImageIcon(s.getFaceSprite(2)));
+                            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(2)));
                         }
                     }
                     repaint();
@@ -444,7 +437,7 @@ public class MinesUI {
                 public void mouseReleased(MouseEvent e) {
                     mouseDown = false;
                     if (!game.isDead() && !game.getWon()) {
-                        faceButton.setIcon(new ImageIcon(s.getFaceSprite(0)));
+                        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
                         if (selected) {
                             if (!clock.isStarted()) {
                                 clock.startTimer();
@@ -482,31 +475,28 @@ public class MinesUI {
             Graphics2D g2 = (Graphics2D) g;
             Cell cell = game.getBoard()[row][col];
             BufferedImage tileImg = cell.getImg();
-            if (game.isDead()) {
-                if (cell.getState() == Cell.State.FLAGGED) {
-                    if (cell.isMine()) {
-                        tileImg = s.getTileSprite(2);
-                    } else {
-                        tileImg = s.getTileSprite(7);
-                    }
-                }
+
+            // On death, if the cell wasn't actually a mine but it was flagged, draw a red X mine
+            if (cell.getState() == Cell.State.FLAGGED && !cell.isMine() && game.isDead()) {
+                tileImg = loader.getTileSprite(7);
             }
+
             // "Pushed in" sprites
             if (selected) {
                 if (cell.getState() == Cell.State.MARKED) {
-                    tileImg = s.getTileSprite(4);
+                    tileImg = loader.getTileSprite(4);
                 } else if (cell.getState() != Cell.State.FLAGGED) {
-                    tileImg = s.getTileSprite(1);
+                    tileImg = loader.getTileSprite(1);
                 }
             }
-            g2.drawImage(tileImg, 0, 0, s.getTileDimensions()[0],
-                    s.getTileDimensions()[1], this);
+            g2.drawImage(tileImg, 0, 0, loader.getTileDimensions()[0],
+                    loader.getTileDimensions()[1], this);
         }
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(s.getTileDimensions()[0],
-                    s.getTileDimensions()[1]);
+            return new Dimension(loader.getTileDimensions()[0],
+                    loader.getTileDimensions()[1]);
         }
     }
 

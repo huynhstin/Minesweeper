@@ -11,13 +11,16 @@ class Cell {
     enum State {
         HIDDEN, FLAGGED, REVEALED, MARKED
     }
+
+    private final SpriteLoader loader = new SpriteLoader();
     private State state;
     private int value;
     private boolean lastClicked;
-    private SpriteLoader s = new SpriteLoader();
+
     Cell() {
-        this.value = 0;
         state = State.HIDDEN;
+        this.value = 0;
+        lastClicked = false;
     }
 
     State getState() {
@@ -37,26 +40,28 @@ class Cell {
     }
 
     void reveal() {
-        if (state != State.REVEALED) {
+        if (state != State.REVEALED && state != State.FLAGGED) {
             state = State.REVEALED;
         }
     }
 
     /**
-     * Set flagCell
+     * Flag the cell
      * @return number of flags to increase by
      */
     int flagCell(boolean markOption) {
-        if (state == State.HIDDEN) {
-            state = State.FLAGGED;
-            return -1; // remove one flagCell
-        } else if (state == State.FLAGGED) {
-            state = markOption ? State.MARKED : State.HIDDEN;
-            return 1; // add one flagCell back
-        } else if (state == State.MARKED) { // if markOption is false, it'll never get here
-            state = State.HIDDEN;
+        switch (state) {
+            case HIDDEN:
+                state = State.FLAGGED;
+                return -1;
+            case FLAGGED:
+                state = markOption ? State.MARKED : State.HIDDEN;
+                return 1;
+            case MARKED:
+                state = State.HIDDEN;
+                return 0;
         }
-        return 0; // if state is revealed, add nothing
+        return 0;
     }
 
     int getValue() {
@@ -64,7 +69,7 @@ class Cell {
     }
 
     void increase() {
-        if (value >= 0) { // don't increment bombs
+        if (value != -1) { // don't increment bombs
             this.value++;
         }
     }
@@ -83,19 +88,19 @@ class Cell {
         switch (state) {
             case REVEALED:
                 if (isMine()) { // if last clicked, red bg; else normal bg
-                    return lastClicked ? s.getTileSprite(6) : s.getTileSprite(5);
+                    return lastClicked ? loader.getTileSprite(6) : loader.getTileSprite(5);
                 } else if (value == 0) { // empty
-                    return s.getTileSprite(1);
+                    return loader.getTileSprite(1);
                 } else if (value >= 1 && value <= 8) {
-                    return s.getTileSprite(7 + value);
+                    return loader.getTileSprite(7 + value);
                 }
                 break;
             case FLAGGED:
-                return s.getTileSprite(2);
+                return loader.getTileSprite(2);
             case HIDDEN:
-                return s.getTileSprite(0);
+                return loader.getTileSprite(0);
             case MARKED:
-                return s.getTileSprite(3);
+                return loader.getTileSprite(3);
         }
         return null;
     }
