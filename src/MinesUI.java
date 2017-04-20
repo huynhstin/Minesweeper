@@ -123,18 +123,7 @@ public class MinesUI {
         });
         link.setToolTipText("Will open browser.");
 
-        JMenuItem code = new JMenuItem("View on GitHub");
-        code.addActionListener(event -> {
-            try {
-                Desktop.getDesktop().browse(new URL("http://www.github.com/huynhstin/Minesweeper").toURI());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        code.setToolTipText("Will open browser.");
-
         help.add(link);
-        help.add(code);
         menuBar.add(help);
         frame.setJMenuBar(menuBar);
 
@@ -212,7 +201,6 @@ public class MinesUI {
 
         frame.revalidate();
         frame.pack();
-        frame.setLocationRelativeTo(null);
     }
 
     private void reset() {
