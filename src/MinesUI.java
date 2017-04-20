@@ -67,6 +67,7 @@ public class MinesUI {
         frame.setResizable(false);
         frame.setTitle("Minesweeper");
         frame.setBackground(background);
+        frame.setIconImage(loader.getIcon());
 
         /* Menu */
         JMenuBar menuBar = new JMenuBar();
@@ -178,6 +179,7 @@ public class MinesUI {
         grid = new Grid();
         frame.add(grid);
         frame.pack();
+        frame.setLocationRelativeTo(null);
     }
 
     /**
