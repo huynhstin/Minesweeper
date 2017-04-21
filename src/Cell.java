@@ -1,3 +1,5 @@
+import java.awt.image.BufferedImage;
+
 /**
  * Cell object
  * Tiles have a value between -1 and 8:
@@ -5,23 +7,17 @@
  * @author huynhstin
  */
 
-import java.awt.image.BufferedImage;
-
 class Cell {
     enum State {
         HIDDEN, FLAGGED, REVEALED, MARKED
     }
 
     private final SpriteLoader loader = new SpriteLoader();
-    private State state;
-    private int value;
-    private boolean lastClicked;
-
-    Cell() {
-        state = State.HIDDEN;
-        this.value = 0;
-        lastClicked = false;
-    }
+    private State state = State.HIDDEN;
+    private int value = 0;
+    private boolean lastClicked = false;
+    private final int MINE_VAL = -1;
+    private final int EMPTY_VAL = 0;
 
     State getState() {
         return state;
@@ -32,22 +28,32 @@ class Cell {
     }
 
     void makeMine() {
-        value = -1;
+        value = MINE_VAL;
     }
 
     boolean isMine() {
-        return value == -1;
+        return value == MINE_VAL;
     }
 
+    boolean isEmpty() {
+        return value == EMPTY_VAL;
+    }
+
+    /**
+     * Change the state of the current cell to REVEALED.
+     * Don't do this if the state is FLAGGED, since FLAGGED cells should
+     *  stay flagged until un-flagged or until the game is won/lost.
+     */
     void reveal() {
-        if (state != State.REVEALED && state != State.FLAGGED) {
+        if (state != State.FLAGGED) {
             state = State.REVEALED;
         }
     }
 
     /**
      * Flag the cell
-     * @return number of flags to increase by
+     * @return number of flags to increase flag count by
+     * @param markOption whether or not to consider marks when changing the state of the cell.
      */
     int flagCell(boolean markOption) {
         switch (state) {
@@ -68,8 +74,12 @@ class Cell {
         return value;
     }
 
+    /**
+     * Increment the value of the cell, to be used when generating the board.
+     * Do not increment the cell if it is a mine.
+     */
     void increase() {
-        if (value != -1) { // don't increment bombs
+        if (value != MINE_VAL) {
             this.value++;
         }
     }
@@ -87,9 +97,10 @@ class Cell {
     BufferedImage getImg() {
         switch (state) {
             case REVEALED:
-                if (isMine()) { // if last clicked, red bg; else normal bg
+                if (isMine()) {
+                    // if last clicked, red bg; else normal bg
                     return lastClicked ? loader.getTileSprite(6) : loader.getTileSprite(5);
-                } else if (value == 0) { // empty
+                } else if (isEmpty()) {
                     return loader.getTileSprite(1);
                 } else if (value >= 1 && value <= 8) {
                     return loader.getTileSprite(7 + value);

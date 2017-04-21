@@ -1,8 +1,3 @@
-/**
- * GUI for Minesweeper game
- * @author huynhstin
- */
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -19,6 +14,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.swing.border.EmptyBorder;
@@ -40,16 +37,20 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+/**
+ * GUI for Minesweeper game
+ * @author huynhstin
+ */
+
 public class MinesUI {
-    private final SpriteLoader loader = new SpriteLoader();
     private Minesweeper game = new Minesweeper(Minesweeper.Difficulty.BEGINNER);
+    private final SpriteLoader loader = new SpriteLoader();
     private final JFrame frame = new JFrame();
     private final JButton faceButton = new JButton();
-    private final JPanel topPanel = new JPanel();
-    private DigClock clock = new DigClock();
-    private Grid grid;
-    private FlagTicker flagger;
     private final Color background = new Color(192, 192, 192);
+    private final FlagTicker flagger = new FlagTicker();
+    private DigClock clock = new DigClock();
+    private Grid grid = new Grid();
 
     private MinesUI() {
         init();
@@ -117,7 +118,7 @@ public class MinesUI {
         link.addActionListener(event -> {
             try {
                 Desktop.getDesktop().browse(new URL("http://www.minesweeper.info/wiki/Strategy").toURI());
-            } catch (Exception e) {
+            } catch (URISyntaxException | IOException e) {
                 e.printStackTrace();
             }
         });
@@ -155,19 +156,41 @@ public class MinesUI {
         buttonPanel.add(faceButton);
         buttonPanel.setBorder(null);
 
+        JPanel topPanel = new JPanel();
         topPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
         topPanel.setLayout(new GridLayout(1, 3));
-        flagger = new FlagTicker();
         topPanel.add(flagger);
         topPanel.add(buttonPanel);
         topPanel.add(clock);
         topPanel.setBackground(background);
         frame.add(topPanel, BorderLayout.NORTH);
 
-        grid = new Grid();
         frame.add(grid);
         frame.pack();
         frame.setLocationRelativeTo(null);
+    }
+
+    /**
+     * Reset game with the same difficulty as before.
+     * Do this by creating a new Minesweeper object, and resetting timer and flags.
+     * Note that we do not need to create a new Grid object:
+     *      we only have to update its sprites since the dimensions will remain the same.
+     */
+    private void reset() {
+        boolean marks = game.isMarkOption();
+        game = new Minesweeper(game.getDiff());
+        game.setMarkOption(marks);
+
+        flagger.updateFlags();
+
+        clock.resetTimer();
+
+        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
+
+        frame.revalidate();
+        grid.repaint();
+        grid.updateImgs();
+        System.gc();
     }
 
     /**
@@ -182,44 +205,23 @@ public class MinesUI {
 
         boolean marks = game.isMarkOption();
         game = new Minesweeper(gameDiff);
+        game.setMarkOption(marks);
 
         frame.remove(grid);
+
         grid.killAll();
         grid.removeAll();
         grid = new Grid();
         frame.add(grid);
 
-        game.setMarkOption(marks);
         flagger.updateFlags();
 
-        topPanel.remove(clock);
-        clock = new DigClock();
-        topPanel.add(clock);
+        clock.resetTimer();
 
         faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
 
         frame.revalidate();
         frame.pack();
-        System.gc();
-    }
-
-    private void reset() {
-        boolean marks = game.isMarkOption();
-        Minesweeper.Difficulty diff = game.getDiff();
-        game = new Minesweeper(diff);
-
-        game.setMarkOption(marks);
-        flagger.updateFlags();
-
-        topPanel.remove(clock);
-        clock = new DigClock();
-        topPanel.add(clock);
-
-        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
-
-        frame.revalidate();
-        grid.repaint();
-        grid.updateImgs();
         System.gc();
     }
 
@@ -265,10 +267,10 @@ public class MinesUI {
                 String model = String.format("%03d", secs);
                 for (int i = 0; i < digits; i++) {
                     int digit = Character.getNumericValue(model.charAt(i));
-                    if (digit == Character.getNumericValue(old.charAt(i))) {
-                        continue; // Don't bother changing the image if it's the same digit as before.
+                    if (digit != Character.getNumericValue(old.charAt(i))) {
+                        // Don't bother changing the image if it's the same digit as before.
+                        timeLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(digit)));
                     }
-                    timeLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(digit)));
                 }
                 this.repaint();
             });
@@ -288,6 +290,16 @@ public class MinesUI {
             t.stop();
         }
 
+        void resetTimer() {
+            started = false;
+            t.stop();
+            secs = 1;
+            // Reset timer to "000"
+            for (int i = 0; i < digits; i++) {
+                timeLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(0)));
+            }
+        }
+
         boolean isStarted() {
             return started;
         }
@@ -299,13 +311,16 @@ public class MinesUI {
         }
     }
 
+    /**
+     * The JComponent that displays the remaining flags.
+     */
     class FlagTicker extends JComponent {
-        private final int digits = 3;
-        private JLabel[] digitLabels = new JLabel[digits];
+        private final int DIGITS = 3;
+        private JLabel[] digitLabels = new JLabel[DIGITS];
 
         FlagTicker() {
             super();
-            for (int i = 0; i < digits; i++) {
+            for (int i = 0; i < DIGITS; i++) {
                 digitLabels[i] = new JLabel();
                 this.add(digitLabels[i]);
             }
@@ -317,7 +332,7 @@ public class MinesUI {
 
         void updateFlags() {
             String model = String.format("%03d", game.getFlagsLeft());
-            for (int i = 0; i < digits; i++) {
+            for (int i = 0; i < DIGITS; i++) {
                 digitLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(
                         Character.getNumericValue(model.charAt(i)))));
             }
@@ -327,7 +342,7 @@ public class MinesUI {
         @Override
         public Dimension getPreferredSize() {
             return new Dimension(loader.getNumDimensions()[0],
-                    loader.getNumDimensions()[1] * digits);
+                    loader.getNumDimensions()[1] * DIGITS);
         }
     }
 
@@ -335,10 +350,9 @@ public class MinesUI {
      * The grid JComponent
      */
     public class Grid extends JPanel {
-        private Square[][] cells; // the array of squares
+        private Square[][] cells;
         private int rows;
         private int cols;
-        private boolean mouseDownOnGrid = false;
 
         Grid() {
             rows = game.getDim()[0];
@@ -346,10 +360,6 @@ public class MinesUI {
             createBoard();
             this.setBackground(background);
             this.setBorder(new EmptyBorder(5, 10, 10, 10));
-        }
-
-        boolean isMouseDown() {
-            return mouseDownOnGrid;
         }
 
         void createBoard() {
@@ -383,6 +393,9 @@ public class MinesUI {
             }
         }
 
+        /**
+         * Repaint only the Squares that appear in changedList, then clear that list.
+         */
         void updateImgs() {
             for (int[] coords : game.getChangedList()) {
                 cells[coords[0]][coords[1]].repaint();
@@ -390,6 +403,9 @@ public class MinesUI {
             game.clearChangedList();
         }
 
+        /**
+         * Remove all the squares from the array, to kill the listeners and free up memory.
+         */
         void killAll() {
             for (int r = 0; r < this.rows; r++) {
                 for (int c = 0; c < this.cols; c++) {
@@ -422,14 +438,12 @@ public class MinesUI {
                             if (game.getBoard()[row][col].getState() != Cell.State.REVEALED) {
                                 selected = true;
                             }
-
                             // last click bool for red bg bombs
                             if (game.getBoard()[row][col].isMine()) {
                                 game.getPrevLastClicked().setLastClicked(false);
                                 game.getBoard()[row][col].setLastClicked(true);
                                 game.setLastClickedCell(game.getBoard()[row][col]);
                             }
-
                             faceButton.setIcon(new ImageIcon(loader.getFaceSprite(2)));
                         } else if (SwingUtilities.isMiddleMouseButton(e)) {
                             faceButton.setIcon(new ImageIcon(loader.getFaceSprite(2)));
@@ -457,6 +471,10 @@ public class MinesUI {
                     }
                 }
 
+                /**
+                 * When the mouse exits the Square, the Square is no longer
+                 *  considered 'selected', so make that boolean false and repaint.
+                 */
                 @Override
                 public void mouseExited(MouseEvent e) {
                     super.mouseExited(e);
@@ -474,12 +492,12 @@ public class MinesUI {
             BufferedImage tileImg = cell.getImg();
 
             // On death, if the cell wasn't actually a mine but it was flagged, draw a red X mine
-            if (cell.getState() == Cell.State.FLAGGED && !cell.isMine() && game.isDead()) {
+            if (game.isDead() && cell.getState() == Cell.State.FLAGGED && !cell.isMine()) {
                 tileImg = loader.getTileSprite(7);
             }
 
             // "Pushed in" sprites
-            if (selected || grid.isMouseDown()) {
+            if (selected) {
                 if (cell.getState() == Cell.State.MARKED) {
                     tileImg = loader.getTileSprite(4);
                 } else if (cell.getState() != Cell.State.FLAGGED) {

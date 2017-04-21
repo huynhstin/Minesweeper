@@ -1,10 +1,10 @@
+import java.util.ArrayList;
+import java.util.Random;
+
 /**
  * Logic for Minesweeper
  * @author huynhstin
  */
-
-import java.util.ArrayList;
-import java.util.Random;
 
 class Minesweeper {
     enum Difficulty {
@@ -60,9 +60,14 @@ class Minesweeper {
         return flagsLeft;
     }
 
+    /**
+     * Flag the cell located at the given coordinates.
+     * Only flagCell if you have flags left, or if the cell you are trying to
+     *  flagCell is already flagged, meaning that you are trying to toggle.
+     * @param r row
+     * @param c column
+     */
     void flag(int r, int c) {
-        /* Only flagCell if you have flags left, or if the cell you are trying to
-           flagCell is already flagged, meaning that you are trying to toggle. */
         if (flagsLeft > 0 || board[r][c].getState() == Cell.State.FLAGGED) {
             flagsLeft += board[r][c].flagCell(markOption);
         }
@@ -146,7 +151,6 @@ class Minesweeper {
 
     void move(int r, int c) {
         if (!dead && !won) {
-
             // only move if if it's within bound (for recursive calls), and if it's currently hidden or marked
             if (inBound(r, c) && (board[r][c].getState() == Cell.State.HIDDEN ||
                                        board[r][c].getState() == Cell.State.MARKED)) {
@@ -164,6 +168,9 @@ class Minesweeper {
                         }
                         return;
                     }
+                } else if (board[r][c].isMine()) {
+                    // In the very slight chance that the new spot is a mine, set the background to red
+                    board[r][c].setLastClicked(true);
                 }
                 board[r][c].reveal(); // reveal it, since it was hidden
                 revealed++;
@@ -208,21 +215,10 @@ class Minesweeper {
         if (revealed == (rows * cols) - mines) {
             for (int[] mineLocation : mineLocations) {
                 Cell mine = board[mineLocation[0]][mineLocation[1]];
-                switch (mine.getState()) {
-                    case FLAGGED:
-                        // If already flagged, ignore.
-                        continue;
-                    case MARKED:
-                        /* Don't want to call flag() method, since that will toggle
-                        the state back to HIDDEN. Instead, manually set state to FLAGGED
-                        and decrement flagsLeft to reflect that. */
-                        mine.setState(Cell.State.FLAGGED);
-                        flagsLeft--;
-                        changedList.add(new int[]{mineLocation[0], mineLocation[1]});
-                        break;
-                    default:
-                        flag(mineLocation[0], mineLocation[1]);
-                        changedList.add(new int[]{mineLocation[0], mineLocation[1]});
+                if (mine.getState() != Cell.State.FLAGGED) {
+                    mine.setState(Cell.State.FLAGGED);
+                    flagsLeft--;
+                    changedList.add(new int[]{mineLocation[0], mineLocation[1]});
                 }
             }
             won = true;
