@@ -239,10 +239,10 @@ public class MinesUI {
     }
 
     class DigClock extends JComponent {
-        private final int digits = 3;
+        private final int DIGITS = 3;
         private int secs = 1;
         private boolean started = false;
-        private JLabel[] timeLabels = new JLabel[digits];
+        private JLabel[] timeLabels = new JLabel[DIGITS];
         private Timer t;
 
         DigClock() {
@@ -252,7 +252,7 @@ public class MinesUI {
             this.setBackground(background);
 
             // Initialize to all 0 sprites
-            for (int i = 0; i < digits; i++) {
+            for (int i = 0; i < DIGITS; i++) {
                 timeLabels[i] = new JLabel(new ImageIcon(loader.getNumberSprite(0)));
                 this.add(timeLabels[i]);
             }
@@ -265,7 +265,7 @@ public class MinesUI {
                 }
 
                 String model = String.format("%03d", secs);
-                for (int i = 0; i < digits; i++) {
+                for (int i = 0; i < DIGITS; i++) {
                     int digit = Character.getNumericValue(model.charAt(i));
                     if (digit != Character.getNumericValue(old.charAt(i))) {
                         // Don't bother changing the image if it's the same digit as before.
@@ -295,7 +295,7 @@ public class MinesUI {
             t.stop();
             secs = 1;
             // Reset timer to "000"
-            for (int i = 0; i < digits; i++) {
+            for (int i = 0; i < DIGITS; i++) {
                 timeLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(0)));
             }
         }
@@ -307,7 +307,7 @@ public class MinesUI {
         @Override
         public Dimension getPreferredSize() {
             return new Dimension(loader.getNumDimensions()[0],
-                    loader.getNumDimensions()[1] * digits);
+                    loader.getNumDimensions()[1] * DIGITS);
         }
     }
 
