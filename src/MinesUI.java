@@ -150,7 +150,6 @@ public class MinesUI {
         });
 
         /* Panels */
-
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(background);
         buttonPanel.add(faceButton);
@@ -201,6 +200,7 @@ public class MinesUI {
 
         frame.revalidate();
         frame.pack();
+        System.gc();
     }
 
     private void reset() {
@@ -220,6 +220,7 @@ public class MinesUI {
         frame.revalidate();
         grid.repaint();
         grid.updateImgs();
+        System.gc();
     }
 
     private void endGameCheck() {
@@ -257,7 +258,7 @@ public class MinesUI {
             t = new Timer(1000, e -> {
                 String old = String.format("%03d", secs);
                 secs++;
-                if (secs >= 999) {
+                if (secs > 999) {
                     secs = 0;
                 }
 
@@ -337,6 +338,7 @@ public class MinesUI {
         private Square[][] cells; // the array of squares
         private int rows;
         private int cols;
+        private boolean mouseDownOnGrid = false;
 
         Grid() {
             rows = game.getDim()[0];
@@ -344,6 +346,10 @@ public class MinesUI {
             createBoard();
             this.setBackground(background);
             this.setBorder(new EmptyBorder(5, 10, 10, 10));
+        }
+
+        boolean isMouseDown() {
+            return mouseDownOnGrid;
         }
 
         void createBoard() {
@@ -393,14 +399,13 @@ public class MinesUI {
         }
     }
 
+    /**
+     * The graphic wrapper for the Cell class
+     */
     public class Square extends JComponent {
         private final int row;
         private final int col;
         private boolean selected = false;
-
-        /* Used to make sure mouse is still down,
-        so it knows to release the selected sprite. */
-        private boolean mouseDown = false;
 
         private Square(int row, int col) {
             this.row = row;
@@ -408,12 +413,12 @@ public class MinesUI {
             this.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
+                    super.mousePressed(e);
                     if (!game.isDead() && !game.getWon()) {
                         if (SwingUtilities.isRightMouseButton(e)) {
                             game.flag(row, col);
                             flagger.updateFlags();
                         } else if (SwingUtilities.isLeftMouseButton(e)) {
-                            mouseDown = true;
                             if (game.getBoard()[row][col].getState() != Cell.State.REVEALED) {
                                 selected = true;
                             }
@@ -435,7 +440,7 @@ public class MinesUI {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    mouseDown = false;
+                    super.mouseReleased(e);
                     if (!game.isDead() && !game.getWon()) {
                         faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
                         if (selected) {
@@ -448,23 +453,15 @@ public class MinesUI {
                             selected = false;
                         }
                         endGameCheck();
+                        repaint();
                     }
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    if (mouseDown) {
-                        selected = false;
-                        repaint();
-                    }
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    if (mouseDown) {
-                        selected = true;
-                        repaint();
-                    }
+                    super.mouseExited(e);
+                    selected = false;
+                    repaint();
                 }
             });
         }
@@ -482,7 +479,7 @@ public class MinesUI {
             }
 
             // "Pushed in" sprites
-            if (selected) {
+            if (selected || grid.isMouseDown()) {
                 if (cell.getState() == Cell.State.MARKED) {
                     tileImg = loader.getTileSprite(4);
                 } else if (cell.getState() != Cell.State.FLAGGED) {

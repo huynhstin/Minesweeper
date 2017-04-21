@@ -152,7 +152,6 @@ class Minesweeper {
                                        board[r][c].getState() == Cell.State.MARKED)) {
                 if (!madeFirstMove) {
                     madeFirstMove = true;
-
                     /* If you hit a mine on your first move, generate a new board.
                        There is still a chance that the new spot will be a mine,
                        but if their luck is that bad, they probably deserve it. */
@@ -208,8 +207,23 @@ class Minesweeper {
     boolean checkWin() {
         if (revealed == (rows * cols) - mines) {
             for (int[] mineLocation : mineLocations) {
-                flag(mineLocation[0], mineLocation[1]);
-                changedList.add(new int[]{mineLocation[0], mineLocation[1]});
+                Cell mine = board[mineLocation[0]][mineLocation[1]];
+                switch (mine.getState()) {
+                    case FLAGGED:
+                        // If already flagged, ignore.
+                        continue;
+                    case MARKED:
+                        /* Don't want to call flag() method, since that will toggle
+                        the state back to HIDDEN. Instead, manually set state to FLAGGED
+                        and decrement flagsLeft to reflect that. */
+                        mine.setState(Cell.State.FLAGGED);
+                        flagsLeft--;
+                        changedList.add(new int[]{mineLocation[0], mineLocation[1]});
+                        break;
+                    default:
+                        flag(mineLocation[0], mineLocation[1]);
+                        changedList.add(new int[]{mineLocation[0], mineLocation[1]});
+                }
             }
             won = true;
         }
