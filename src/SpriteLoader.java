@@ -20,13 +20,13 @@ class SpriteLoader {
     private Image icon;
 
     private BufferedImage[] tileSprites;
-    private BufferedImage[] numSprites;
-    private BufferedImage[] faceSprites;
+    private ImageIcon[] numSprites;
+    private ImageIcon[] faceSprites;
 
     // Row x Col
-    private final int[] tileGrouping = {2, 8};
-    private final int[] numGrouping = {1, 10};
-    private final int[] faceGrouping = {1, 5};
+    private static final int[] tileGrouping = {2, 8};
+    private static final int[] numGrouping = {1, 10};
+    private static final int[] faceGrouping = {1, 5};
 
     // Height x Width
     private int[] tileDimensions;
@@ -73,9 +73,9 @@ class SpriteLoader {
         faceDimensions = new int[] {faceSheet.getHeight() / faceGrouping[0],
                                     faceSheet.getWidth() / faceGrouping[1]};
 
-        chopTileSprites();
-        chopNumSprites();
-        chopFaceSprites();
+        loadTileSprites();
+        loadNumSprites();
+        loadFaceSprites();
     }
 
     /**
@@ -95,7 +95,7 @@ class SpriteLoader {
      * Chop up the tile sprite sheet into individual images,
      * and then store them in an array.
      */
-    private void chopTileSprites() {
+    private void loadTileSprites() {
         int height = tileDimensions[0];
         int width = tileDimensions[1];
 
@@ -112,32 +112,32 @@ class SpriteLoader {
         }
     }
 
-    private void chopNumSprites() {
+    private void loadNumSprites() {
         int height = numDimensions[0];
         int width = numDimensions[1];
 
         // Only one row, so ignore rows
         int cols = numGrouping[1];
 
-        numSprites = new BufferedImage[cols];
+        numSprites = new ImageIcon[cols];
 
         for (int c = 0; c < cols; c++) {
-            numSprites[c] = numSheet.getSubimage(c * width, 0, width, height);
+            numSprites[c] = new ImageIcon(numSheet.getSubimage(c * width, 0, width, height));
         }
     }
 
-    private void chopFaceSprites() {
+    private void loadFaceSprites() {
         int height = faceDimensions[0];
         int width = faceDimensions[1];
 
         // Only one row, so ignore rows
         int cols = faceGrouping[1];
 
-        faceSprites = new BufferedImage[cols];
+        faceSprites = new ImageIcon[cols];
 
         for (int c = 0; c < cols; c++) {
-            faceSprites[c] = faceSheet.getSubimage(
-                    c * width, 0, width, height);
+            faceSprites[c] = new ImageIcon(faceSheet.getSubimage(
+                    c * width, 0, width, height));
         }
     }
 
@@ -160,7 +160,7 @@ class SpriteLoader {
      * @param num number sprite to get: 0 gets 0, 1 gets 1, etc
      * @return image of that number
      */
-    BufferedImage getNumberSprite(int num) {
+    ImageIcon getNumberSprite(int num) {
         return numSprites[num];
     }
 
@@ -174,7 +174,7 @@ class SpriteLoader {
      *            4 = dead </P>
      * @return button image
      */
-    BufferedImage getFaceSprite(int num) {
+    ImageIcon getFaceSprite(int num) {
         return faceSprites[num];
     }
 

@@ -13,11 +13,11 @@ class Cell {
     }
 
     private final SpriteLoader loader = new SpriteLoader();
+    private static final int MINE_VAL = -1;
+    private static final int EMPTY_VAL = 0;
     private State state = State.HIDDEN;
     private int value = 0;
     private boolean lastClicked = false;
-    private final int MINE_VAL = -1;
-    private final int EMPTY_VAL = 0;
 
     State getState() {
         return state;
@@ -39,13 +39,17 @@ class Cell {
         return value == EMPTY_VAL;
     }
 
+    void setEmpty() {
+        value = EMPTY_VAL;
+    }
+
     /**
-     * Change the state of the current cell to REVEALED.
+     * Change the state of the current cell to REVEALED. <br>
      * Don't do this if the state is FLAGGED, since FLAGGED cells should
      *  stay flagged until un-flagged or until the game is won/lost.
      */
     void reveal() {
-        if (state != State.FLAGGED) {
+        if (state != State.REVEALED && state != State.FLAGGED) {
             state = State.REVEALED;
         }
     }
@@ -75,12 +79,12 @@ class Cell {
     }
 
     /**
-     * Increment the value of the cell, to be used when generating the board.
+     * Increment the value of the cell, to be used when generating the board. <br>
      * Do not increment the cell if it is a mine.
      */
-    void increase() {
+    void increase(int amt) {
         if (value != MINE_VAL) {
-            this.value++;
+            this.value += amt;
         }
     }
 
@@ -89,7 +93,7 @@ class Cell {
     }
 
     /**
-     * Returns basic images associated with each cell.
+     * Returns basic images associated with each cell. <br>
      * This does not return images that rely on game state
      *  (e.g. dead/alive, click state): this is delegated to MinesUI.
      * @return image of cell

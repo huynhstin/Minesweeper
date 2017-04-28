@@ -21,14 +21,14 @@ class Minesweeper {
     private boolean dead = false;
     private boolean madeFirstMove = false;
     private boolean won = false;
-    private Random randy = new Random();
+    private final Random randy = new Random();
     private Cell lastClickedCell;
     private boolean markOption = false;
-    private Difficulty diff;
+    private final Difficulty diff;
 
     /* This list holds the coordinates of all the Cells that have changed
      state, to avoid having to repaint all of the Cells on each click. */
-    private ArrayList<int[]> changedList = new ArrayList<>();
+    private ArrayList<int[]> toPaint = new ArrayList<>();
 
     Minesweeper(Difficulty diff) {
         this.diff = diff;
@@ -54,6 +54,17 @@ class Minesweeper {
         fillBoard();
         flagsLeft = mines;
         lastClickedCell = board[0][0]; // doesn't matter; will update on first click
+        printMines();
+    }
+
+    /**
+     * TODO delete this
+     */
+    void printMines() {
+        for (int[] mineLoc : mineLocations) {
+            System.out.printf("%d, %d\n", mineLoc[0], mineLoc[1]);
+        }
+        System.out.println("******");
     }
 
     int getFlagsLeft() {
@@ -61,9 +72,9 @@ class Minesweeper {
     }
 
     /**
-     * Flag the cell located at the given coordinates.
+     * Flag the cell located at the given coordinates. <br>
      * Only flagCell if you have flags left, or if the cell you are trying to
-     *  flagCell is already flagged, meaning that you are trying to toggle.
+     *  flagCell is already flagged, meaning that you are toggling.
      * @param r row
      * @param c column
      */
@@ -109,27 +120,27 @@ class Minesweeper {
             int c = randy.nextInt(cols);
             if (!board[r][c].isMine()) {
                 board[r][c].makeMine();
-                incrSurround(r, c);
+                incrSurround(r, c, 1);
                 mineLocations[minesLeft - 1] = new int[]{r, c};
                 minesLeft--;
             }
         }
     }
 
-    private void incrSurround(int r, int c) {
-        incrCell(r + 1, c);
-        incrCell(r - 1, c);
-        incrCell(r, c + 1);
-        incrCell(r, c - 1);
-        incrCell(r + 1, c + 1);
-        incrCell(r - 1, c - 1);
-        incrCell(r + 1, c - 1);
-        incrCell(r - 1, c + 1);
+    private void incrSurround(int r, int c, int amt) {
+        incrCell(r + 1, c, amt);
+        incrCell(r - 1, c, amt);
+        incrCell(r, c + 1, amt);
+        incrCell(r, c - 1, amt);
+        incrCell(r + 1, c + 1, amt);
+        incrCell(r - 1, c - 1, amt);
+        incrCell(r + 1, c - 1, amt);
+        incrCell(r - 1, c + 1, amt);
     }
 
-    private void incrCell(int r, int c) {
+    private void incrCell(int r, int c, int amt) {
         if (inBound(r, c)) {
-            board[r][c].increase();
+            board[r][c].increase(amt);
         }
     }
 
@@ -156,27 +167,19 @@ class Minesweeper {
                                        board[r][c].getState() == Cell.State.MARKED)) {
                 if (!madeFirstMove) {
                     madeFirstMove = true;
-                    /* If you hit a mine on your first move, generate a new board.
-                       There is still a chance that the new spot will be a mine,
-                       but if their luck is that bad, they probably deserve it. */
                     if (board[r][c].isMine()) {
-                        Cell.State state = board[r][c].getState();
-                        fillBoard();
+                        firstMoveDeath(r, c);
                         move(r, c);
-                        if (state == Cell.State.FLAGGED || state == Cell.State.MARKED) {
-                            board[r][c].setState(state);
-                        }
                         return;
                     }
-                } else if (board[r][c].isMine()) {
-                    // In the very slight chance that the new spot is a mine, set the background to red
-                    board[r][c].setLastClicked(true);
                 }
                 board[r][c].reveal(); // reveal it, since it was hidden
                 revealed++;
-                changedList.add(new int[]{r, c});
-                if (board[r][c].isMine()) { // if you hit a bomb, you dead
+                toPaint.add(new int[]{r, c});
+                if (board[r][c].isMine()) { // if you hit a bomb, you dead.
+                    System.out.printf("board at %d %d is a bomb!\n", r, c);
                     dead = true;
+                    revealOnDead();
                 } else if (board[r][c].getValue() > 0) { // once we hit a number, get out
                     return;
                 } else { // reveal all the ones around it
@@ -193,23 +196,67 @@ class Minesweeper {
         }
     }
 
-    ArrayList<int[]> getChangedList() {
-        return changedList;
+    /**
+     * Prevents first move deaths (hitting a mine on your first click).
+     * <P> Process: <br> Finds the location of that mine in the mineLocations array,
+     *  then generates a new mine in a random location. <br> Then, put the new mine's
+     *  coordinates at the index that the old mine used to occupy in the mineLocations array. </P>
+     * @param r row
+     * @param c col
+     */
+    //TODO: clear around current mine
+    private void firstMoveDeath(int r, int c) {
+        // mineLocations is saved as [numberOfMines][coordinates]
+        // need to search for the index of where the current mine is saved, so we can remove it
+        int locInArr = 0;
+        int count = 0;
+        for (int[] mineCoords : mineLocations) {
+            if (mineCoords[0] == r && mineCoords[1] == c) {
+                locInArr = count;
+                System.out.println(locInArr);
+            }
+            count++;
+        }
+
+        // Modified version of generate method
+        // Don't make current one empty until we generate, so it knows not to generate it at the current index
+        while (true) { // go until we break
+            int i = randy.nextInt(this.rows);
+            int j = randy.nextInt(this.cols);
+            if (!board[i][j].isMine() && board[i][j].isEmpty()) {
+                board[i][j].makeMine();
+                incrSurround(i, j, 1);
+                mineLocations[locInArr] = new int[]{i, j};
+                System.out.println("new mine locations:");
+                printMines();
+                break;
+            }
+        }
+        board[r][c].setEmpty();
+        incrSurround(r, c, -1);
+    }
+
+    ArrayList<int[]> getToPaint() {
+        return toPaint;
     }
 
     /**
      * Clears the list of all the coordinates,
      * so we don't repaint the same cells over and over.
      */
-    void clearChangedList() {
-        changedList.clear();
+    void clearToPaint() {
+        toPaint.clear();
     }
 
     /**
-     * Check if won
-     * @return true if the number of revealed tiles is equal to the total
-     *         number of slots - the number of mines, implying that
-     *         player has revealed everything but the mines.
+     * Checks to see if player won:
+     * <P> Checks to see if the number of revealed tiles is
+     *    equal to the number of slots minus the number of mines,
+     *     implying that the player has revealed everything but the mines
+     *     and has therefore won. </P>
+     * <P> If this is true, then the method returns true and
+     *     auto-flags all the mines, and adds those mines to the toPaint list. </P>
+     * @return won or not
      */
     boolean checkWin() {
         if (revealed == (rows * cols) - mines) {
@@ -218,7 +265,7 @@ class Minesweeper {
                 if (mine.getState() != Cell.State.FLAGGED) {
                     mine.setState(Cell.State.FLAGGED);
                     flagsLeft--;
-                    changedList.add(new int[]{mineLocation[0], mineLocation[1]});
+                    toPaint.add(new int[]{mineLocation[0], mineLocation[1]});
                 }
             }
             won = true;
