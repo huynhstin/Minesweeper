@@ -20,7 +20,6 @@ import java.net.URL;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -48,8 +47,8 @@ public class MinesUI {
     private final JFrame frame = new JFrame();
     private final JButton faceButton = new JButton();
     private final Color background = new Color(192, 192, 192);
-    private final FlagTicker flagger = new FlagTicker();
-    private DigClock clock = new DigClock();
+    private final FlagDisplay flagger = new FlagDisplay();
+    private final DigClock clock = new DigClock();
     private Grid grid = new Grid();
 
     private MinesUI() {
@@ -135,18 +134,18 @@ public class MinesUI {
                                     loader.getFaceDimensions()[1]));
         faceButton.setFocusable(false);
         faceButton.setBorder(null);
-        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
+        faceButton.setIcon(loader.getFaceSprite(0));
         faceButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 super.mousePressed(mouseEvent);
-                faceButton.setIcon(new ImageIcon(loader.getFaceSprite(1)));
+                faceButton.setIcon(loader.getFaceSprite(1));
             }
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 super.mouseReleased(mouseEvent);
-                faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
+                faceButton.setIcon(loader.getFaceSprite(0));
             }
         });
 
@@ -185,7 +184,7 @@ public class MinesUI {
 
         clock.resetTimer();
 
-        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
+        faceButton.setIcon(loader.getFaceSprite(0));
 
         frame.revalidate();
         grid.repaint();
@@ -218,7 +217,7 @@ public class MinesUI {
 
         clock.resetTimer();
 
-        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
+        faceButton.setIcon(loader.getFaceSprite(0));
 
         frame.revalidate();
         frame.pack();
@@ -227,13 +226,12 @@ public class MinesUI {
 
     private void endGameCheck() {
         if (game.isDead()) {
-            game.revealOnDead();
             clock.endTimer();
-            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(4)));
+            faceButton.setIcon(loader.getFaceSprite(4));
             grid.repaint();
         } else if (game.checkWin()) {
-            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(3)));
             clock.endTimer();
+            faceButton.setIcon(loader.getFaceSprite(3));
             grid.updateImgs();
         }
     }
@@ -253,12 +251,11 @@ public class MinesUI {
 
             // Initialize to all 0 sprites
             for (int i = 0; i < DIGITS; i++) {
-                timeLabels[i] = new JLabel(new ImageIcon(loader.getNumberSprite(0)));
+                timeLabels[i] = new JLabel(loader.getNumberSprite(0));
                 this.add(timeLabels[i]);
             }
 
             t = new Timer(1000, e -> {
-                String old = String.format("%03d", secs);
                 secs++;
                 if (secs > 999) {
                     secs = 0;
@@ -266,11 +263,7 @@ public class MinesUI {
 
                 String model = String.format("%03d", secs);
                 for (int i = 0; i < DIGITS; i++) {
-                    int digit = Character.getNumericValue(model.charAt(i));
-                    if (digit != Character.getNumericValue(old.charAt(i))) {
-                        // Don't bother changing the image if it's the same digit as before.
-                        timeLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(digit)));
-                    }
+                    timeLabels[i].setIcon(loader.getNumberSprite(Character.getNumericValue(model.charAt(i))));
                 }
                 this.repaint();
             });
@@ -280,7 +273,7 @@ public class MinesUI {
             started = true;
 
             // Make timer display "001" on first click.
-            timeLabels[2].setIcon(new ImageIcon(loader.getNumberSprite(1)));
+            timeLabels[2].setIcon(loader.getNumberSprite(1));
             this.repaint();
             t.start();
         }
@@ -296,7 +289,7 @@ public class MinesUI {
             secs = 1;
             // Reset timer to "000"
             for (int i = 0; i < DIGITS; i++) {
-                timeLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(0)));
+                timeLabels[i].setIcon(loader.getNumberSprite(0));
             }
         }
 
@@ -314,11 +307,11 @@ public class MinesUI {
     /**
      * The JComponent that displays the remaining flags.
      */
-    class FlagTicker extends JComponent {
+    class FlagDisplay extends JComponent {
         private final int DIGITS = 3;
         private JLabel[] digitLabels = new JLabel[DIGITS];
 
-        FlagTicker() {
+        FlagDisplay() {
             super();
             for (int i = 0; i < DIGITS; i++) {
                 digitLabels[i] = new JLabel();
@@ -333,8 +326,7 @@ public class MinesUI {
         void updateFlags() {
             String model = String.format("%03d", game.getFlagsLeft());
             for (int i = 0; i < DIGITS; i++) {
-                digitLabels[i].setIcon(new ImageIcon(loader.getNumberSprite(
-                        Character.getNumericValue(model.charAt(i)))));
+                digitLabels[i].setIcon(loader.getNumberSprite(Character.getNumericValue(model.charAt(i))));
             }
             this.repaint();
         }
@@ -346,14 +338,10 @@ public class MinesUI {
         }
     }
 
-    /**
-     * The grid JComponent
-     */
-    public class Grid extends JPanel {
+     class Grid extends JPanel {
         private Square[][] cells;
         private int rows;
         private int cols;
-
         Grid() {
             rows = game.getDim()[0];
             cols = game.getDim()[1];
@@ -386,6 +374,7 @@ public class MinesUI {
                     } else if (c == game.getCols() - 1) {
                         border = new MatteBorder(0, 0, 0, 1, borderColor); // right edge
                     }
+
                     cells[r][c] = square;
                     square.setBorder(border);
                     this.add(square, gbc);
@@ -397,10 +386,10 @@ public class MinesUI {
          * Repaint only the Squares that appear in changedList, then clear that list.
          */
         void updateImgs() {
-            for (int[] coords : game.getChangedList()) {
+            for (int[] coords : game.getToPaint()) {
                 cells[coords[0]][coords[1]].repaint();
             }
-            game.clearChangedList();
+            game.getToPaint().clear();
         }
 
         /**
@@ -418,7 +407,7 @@ public class MinesUI {
     /**
      * The graphic wrapper for the Cell class
      */
-    public class Square extends JComponent {
+    class Square extends JComponent {
         private final int row;
         private final int col;
         private boolean selected = false;
@@ -436,17 +425,12 @@ public class MinesUI {
                             flagger.updateFlags();
                         } else if (SwingUtilities.isLeftMouseButton(e)) {
                             if (game.getBoard()[row][col].getState() != Cell.State.REVEALED) {
+                                // Don't move until you release the mouse button
                                 selected = true;
                             }
-                            // last click bool for red bg bombs
-                            if (game.getBoard()[row][col].isMine()) {
-                                game.getPrevLastClicked().setLastClicked(false);
-                                game.getBoard()[row][col].setLastClicked(true);
-                                game.setLastClickedCell(game.getBoard()[row][col]);
-                            }
-                            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(2)));
+                            faceButton.setIcon(loader.getFaceSprite(2));
                         } else if (SwingUtilities.isMiddleMouseButton(e)) {
-                            faceButton.setIcon(new ImageIcon(loader.getFaceSprite(2)));
+                            faceButton.setIcon(loader.getFaceSprite(2));
                         }
                     }
                     repaint();
@@ -456,12 +440,20 @@ public class MinesUI {
                 public void mouseReleased(MouseEvent e) {
                     super.mouseReleased(e);
                     if (!game.isDead() && !game.getWon()) {
-                        faceButton.setIcon(new ImageIcon(loader.getFaceSprite(0)));
+                        faceButton.setIcon(loader.getFaceSprite(0));
                         if (selected) {
                             if (!clock.isStarted()) {
                                 clock.startTimer();
                             }
-                            game.move(row, col);
+                            game.move(row, col, true);
+
+                            // last click bool for red bg bombs
+                            if (game.getBoard()[row][col].isMine()) {
+                                game.getPrevLastClicked().setLastClicked(false);
+                                game.getBoard()[row][col].setLastClicked(true);
+                                game.setLastClickedCell(game.getBoard()[row][col]);
+                            }
+
                             grid.updateImgs();
                             repaint();
                             selected = false;
@@ -516,6 +508,6 @@ public class MinesUI {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MinesUI :: new);
+        SwingUtilities.invokeLater(MinesUI::new);
     }
 }
