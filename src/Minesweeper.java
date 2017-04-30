@@ -16,7 +16,7 @@ class Minesweeper {
     private int mines;
     private int flagsLeft;
     private int revealed = 0;
-    private Cell[][] board;
+    private final Cell[][] board;
     private int[][] mineLocations;
     private boolean dead = false;
     private boolean madeFirstMove = false;
@@ -28,7 +28,7 @@ class Minesweeper {
 
     /* This list holds the coordinates of all the Cells that have changed
      state, to avoid having to repaint all of the Cells on each click. */
-    private ArrayList<int[]> toPaint = new ArrayList<>();
+    private final ArrayList<int[]> toPaint = new ArrayList<>();
 
     Minesweeper(Difficulty diff) {
         this.diff = diff;
@@ -54,17 +54,6 @@ class Minesweeper {
         fillBoard();
         flagsLeft = mines;
         lastClickedCell = board[0][0]; // doesn't matter; will update on first click
-        printMines();
-    }
-
-    /**
-     * TODO delete this
-     */
-    void printMines() {
-        for (int[] mineLoc : mineLocations) {
-            System.out.printf("%d, %d\n", mineLoc[0], mineLoc[1]);
-        }
-        System.out.println("******");
     }
 
     int getFlagsLeft() {
@@ -127,6 +116,12 @@ class Minesweeper {
         }
     }
 
+    /**
+     * Increment all the cells around a given coordinate
+     * @param r row
+     * @param c col
+     * @param amt how much to increase by
+     */
     private void incrSurround(int r, int c, int amt) {
         incrCell(r + 1, c, amt);
         incrCell(r - 1, c, amt);
@@ -138,6 +133,12 @@ class Minesweeper {
         incrCell(r - 1, c + 1, amt);
     }
 
+    /**
+     * Increment the cell at the given coordinate
+     * @param r row
+     * @param c col
+     * @param amt how much to increase by
+     */
     private void incrCell(int r, int c, int amt) {
         if (inBound(r, c)) {
             board[r][c].increase(amt);
@@ -160,37 +161,49 @@ class Minesweeper {
         return new int[] {this.rows, this.cols};
     }
 
-    void move(int r, int c) {
+    /**
+     * Make a move
+     * @param r row
+     * @param c col
+     * @param checkMine whether or not to check for mines (for recursive calls)
+     */
+    void move(int r, int c, boolean checkMine) {
         if (!dead && !won) {
             // only move if if it's within bound (for recursive calls), and if it's currently hidden or marked
             if (inBound(r, c) && (board[r][c].getState() == Cell.State.HIDDEN ||
                                        board[r][c].getState() == Cell.State.MARKED)) {
+
+                /* If you hit a mine on the first move, call the firstMoveDeath method
+                 and recursively call this method without checking for mines. */
                 if (!madeFirstMove) {
                     madeFirstMove = true;
                     if (board[r][c].isMine()) {
                         firstMoveDeath(r, c);
-                        move(r, c);
+                        move(r, c, false);
                         return;
                     }
                 }
-                board[r][c].reveal(); // reveal it, since it was hidden
-                revealed++;
-                toPaint.add(new int[]{r, c});
-                if (board[r][c].isMine()) { // if you hit a bomb, you dead.
-                    System.out.printf("board at %d %d is a bomb!\n", r, c);
+
+                if (!board[r][c].isMine()) { // reveal it, since it was hidden. do not reveal mines
+                    board[r][c].reveal();
+                    revealed++;
+                    toPaint.add(new int[]{r, c});
+                }
+
+                if (board[r][c].isMine() && checkMine) { // if you hit a bomb, and we're looking for bombs, you dead.
                     dead = true;
                     revealOnDead();
-                } else if (board[r][c].getValue() > 0) { // once we hit a number, get out
+                } else if (board[r][c].getValue() > 0 || board[r][c].isMine()) { // once we hit a number, get out
                     return;
                 } else { // reveal all the ones around it
-                    move(r + 1, c);
-                    move(r - 1, c);
-                    move(r, c + 1);
-                    move(r, c - 1);
-                    move(r + 1, c + 1);
-                    move(r - 1, c - 1);
-                    move(r + 1, c - 1);
-                    move(r - 1, c + 1);
+                    move(r + 1, c, false);
+                    move(r - 1, c, false);
+                    move(r, c + 1, false);
+                    move(r, c - 1, false);
+                    move(r + 1, c + 1, false);
+                    move(r - 1, c - 1, false);
+                    move(r + 1, c - 1, false);
+                    move(r - 1, c + 1, false);
                 }
             }
         }
@@ -200,11 +213,12 @@ class Minesweeper {
      * Prevents first move deaths (hitting a mine on your first click).
      * <P> Process: <br> Finds the location of that mine in the mineLocations array,
      *  then generates a new mine in a random location. <br> Then, put the new mine's
-     *  coordinates at the index that the old mine used to occupy in the mineLocations array. </P>
+     *  coordinates at the index that the old mine used to occupy in the mineLocations array. <br>
+     *      Set the mine that was clicked to empty and update its value, and finally
+     *      decrement all the cells around the cell, to reflect the mine removal. </P>
      * @param r row
      * @param c col
      */
-    //TODO: clear around current mine
     private void firstMoveDeath(int r, int c) {
         // mineLocations is saved as [numberOfMines][coordinates]
         // need to search for the index of where the current mine is saved, so we can remove it
@@ -213,7 +227,6 @@ class Minesweeper {
         for (int[] mineCoords : mineLocations) {
             if (mineCoords[0] == r && mineCoords[1] == c) {
                 locInArr = count;
-                System.out.println(locInArr);
             }
             count++;
         }
@@ -226,26 +239,50 @@ class Minesweeper {
             if (!board[i][j].isMine() && board[i][j].isEmpty()) {
                 board[i][j].makeMine();
                 incrSurround(i, j, 1);
-                mineLocations[locInArr] = new int[]{i, j};
-                System.out.println("new mine locations:");
-                printMines();
+                mineLocations[locInArr] = new int[]{i, j}; // replace the old mine location with the new one
                 break;
             }
         }
-        board[r][c].setEmpty();
-        incrSurround(r, c, -1);
+
+        board[r][c].setEmpty(); // make current one empty for now
+        updateValOnNotMine(r, c); // update the value of it (if there are mines nearby)
+        incrSurround(r, c, -1); // decrement the surrounding to reflect mine removal
+    }
+
+    /**
+     * When the first clicked cell is a mine, we set it empty and regenerate a new one. <br>
+     * So, we need to update its value if there are mines around it.
+     * @param r row
+     * @param c col
+     */
+    private void updateValOnNotMine(int r, int c) {
+        int val = 0;
+        val += isMineAtCoord(r + 1, c);
+        val += isMineAtCoord(r - 1, c);
+        val += isMineAtCoord(r, c + 1);
+        val += isMineAtCoord(r, c - 1);
+        val += isMineAtCoord(r + 1, c + 1);
+        val += isMineAtCoord(r - 1, c - 1);
+        val += isMineAtCoord(r + 1, c - 1);
+        val += isMineAtCoord(r - 1, c + 1);
+        board[r][c].setValue(val);
+    }
+
+    /**
+     * If there is a mine at that location, return 1; else return 0
+     * @param r row
+     * @param c col
+     * @return number to update value by
+     */
+    private int isMineAtCoord(int r, int c) {
+        if (inBound(r, c) && board[r][c].isMine()) {
+            return 1;
+        }
+        return 0;
     }
 
     ArrayList<int[]> getToPaint() {
         return toPaint;
-    }
-
-    /**
-     * Clears the list of all the coordinates,
-     * so we don't repaint the same cells over and over.
-     */
-    void clearToPaint() {
-        toPaint.clear();
     }
 
     /**
@@ -260,13 +297,11 @@ class Minesweeper {
      */
     boolean checkWin() {
         if (revealed == (rows * cols) - mines) {
+            // Auto-flag all the mines
             for (int[] mineLocation : mineLocations) {
-                Cell mine = board[mineLocation[0]][mineLocation[1]];
-                if (mine.getState() != Cell.State.FLAGGED) {
-                    mine.setState(Cell.State.FLAGGED);
-                    flagsLeft--;
-                    toPaint.add(new int[]{mineLocation[0], mineLocation[1]});
-                }
+                board[mineLocation[0]][mineLocation[1]].setState(Cell.State.FLAGGED);
+                flagsLeft--;
+                toPaint.add(new int[]{mineLocation[0], mineLocation[1]});
             }
             won = true;
         }
@@ -280,7 +315,7 @@ class Minesweeper {
     /**
      * When game is over (dead is true), reveal all the mines
      */
-    void revealOnDead() {
+    private void revealOnDead() {
         if (dead) {
             for (int[] mineLocation : mineLocations) {
                 Cell cell = board[mineLocation[0]][mineLocation[1]];

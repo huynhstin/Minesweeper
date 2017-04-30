@@ -23,7 +23,7 @@ class Cell {
         return state;
     }
 
-    void setState(final State state) {
+    void setState(State state) {
         this.state = state;
     }
 
@@ -41,6 +41,14 @@ class Cell {
 
     void setEmpty() {
         value = EMPTY_VAL;
+    }
+
+    int getValue() {
+        return value;
+    }
+
+    void setValue(int value) {
+        this.value = value;
     }
 
     /**
@@ -72,10 +80,6 @@ class Cell {
                 return 0;
         }
         return 0;
-    }
-
-    int getValue() {
-        return value;
     }
 
     /**

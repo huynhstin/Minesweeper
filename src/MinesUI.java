@@ -20,7 +20,6 @@ import java.net.URL;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -190,7 +189,6 @@ public class MinesUI {
         frame.revalidate();
         grid.repaint();
         grid.updateImgs();
-        game.printMines();
         System.gc();
     }
 
@@ -340,11 +338,10 @@ public class MinesUI {
         }
     }
 
-    public class Grid extends JPanel {
+     class Grid extends JPanel {
         private Square[][] cells;
         private int rows;
         private int cols;
-
         Grid() {
             rows = game.getDim()[0];
             cols = game.getDim()[1];
@@ -377,6 +374,7 @@ public class MinesUI {
                     } else if (c == game.getCols() - 1) {
                         border = new MatteBorder(0, 0, 0, 1, borderColor); // right edge
                     }
+
                     cells[r][c] = square;
                     square.setBorder(border);
                     this.add(square, gbc);
@@ -391,7 +389,7 @@ public class MinesUI {
             for (int[] coords : game.getToPaint()) {
                 cells[coords[0]][coords[1]].repaint();
             }
-            game.clearToPaint();
+            game.getToPaint().clear();
         }
 
         /**
@@ -409,7 +407,7 @@ public class MinesUI {
     /**
      * The graphic wrapper for the Cell class
      */
-    public class Square extends JComponent {
+    class Square extends JComponent {
         private final int row;
         private final int col;
         private boolean selected = false;
@@ -447,7 +445,7 @@ public class MinesUI {
                             if (!clock.isStarted()) {
                                 clock.startTimer();
                             }
-                            game.move(row, col);
+                            game.move(row, col, true);
 
                             // last click bool for red bg bombs
                             if (game.getBoard()[row][col].isMine()) {
