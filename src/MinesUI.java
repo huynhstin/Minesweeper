@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 
 import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.JButton;
@@ -347,7 +349,8 @@ public class MinesUI {
             cols = game.getDim()[1];
             createBoard();
             this.setBackground(background);
-            this.setBorder(new EmptyBorder(5, 10, 10, 10));
+            this.setBorder(new CompoundBorder(new EmptyBorder(5, 10, 10, 10),
+                    new MatteBorder(0, 0, 1, 1, new Color(128, 128, 128))));
         }
 
         void createBoard() {
@@ -355,28 +358,12 @@ public class MinesUI {
             GridBagConstraints gbc = new GridBagConstraints();
             cells = new Square[rows][cols];
 
-            // Create grid and borders, add squares to cells array
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < cols; c++) {
                     gbc.gridx = c;
                     gbc.gridy = r;
                     Square square = new Square(r, c);
-
-                    /* Since the sprites only have the top and left edge painted,
-                       we need to draw in the bottom and right edges manually
-                       if the tile is at the very bottom and/or right edges. */
-                    final Color borderColor = new Color(128, 128, 128);
-                    MatteBorder border = null;
-                    if (r == game.getRows() - 1 && c == game.getCols() - 1) {
-                        border = new MatteBorder(0, 0, 1, 1, borderColor); // bottom right
-                    } else if (r == game.getRows() - 1) {
-                        border = new MatteBorder(0, 0, 1, 0, borderColor); // bottom
-                    } else if (c == game.getCols() - 1) {
-                        border = new MatteBorder(0, 0, 0, 1, borderColor); // right edge
-                    }
-
                     cells[r][c] = square;
-                    square.setBorder(border);
                     this.add(square, gbc);
                 }
             }
