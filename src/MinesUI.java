@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 
 import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
@@ -18,6 +17,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Random;
 
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -30,8 +30,10 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -44,11 +46,11 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 
 public class MinesUI {
-    private Minesweeper game = new Minesweeper(Minesweeper.Difficulty.BEGINNER);
+    private Minesweeper game = new Minesweeper(9, 9, 10);
     private final SpriteLoader loader = new SpriteLoader();
     private final JFrame frame = new JFrame();
     private final JButton faceButton = new JButton();
-    private final Color background = new Color(192, 192, 192);
+    private static final Color background = new Color(192, 192, 192);
     private final FlagDisplay flagger = new FlagDisplay();
     private final DigClock clock = new DigClock();
     private Grid grid = new Grid();
@@ -84,11 +86,13 @@ public class MinesUI {
         separatorOne.setPreferredSize(new Dimension(0, 1));
 
         JMenuItem easyOption = new JMenuItem("Beginner");
-        easyOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.BEGINNER));
+        easyOption.addActionListener(e -> resetNewDiff(9, 9, 10));
         JMenuItem medOption = new JMenuItem("Intermediate");
-        medOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.INTERMEDIATE));
+        medOption.addActionListener(e -> resetNewDiff(16, 16, 40));
         JMenuItem hardOption = new JMenuItem("Expert");
-        hardOption.addActionListener(e -> resetNewDiff(Minesweeper.Difficulty.EXPERT));
+        hardOption.addActionListener(e -> resetNewDiff(16, 30, 99));
+        JMenuItem custom = new JMenuItem("Custom");
+        custom.addActionListener(e -> showCustomSizer());
 
         JSeparator separatorTwo = new JSeparator();
         separatorTwo.setPreferredSize(new Dimension(0, 1));
@@ -108,6 +112,7 @@ public class MinesUI {
         menu.add(easyOption);
         menu.add(medOption);
         menu.add(hardOption);
+        menu.add(custom);
         menu.add(separatorTwo);
         menu.add(marksOn);
         menu.add(separatorThree);
@@ -172,6 +177,83 @@ public class MinesUI {
     }
 
     /**
+     * Shows the dialog to input a custom size for the board.
+     */
+    private void showCustomSizer() {
+        final int MAX_ROWS = 45;
+        final int MIN_ROWS = 1;
+        final int MAX_COLS = 45;
+        final int MIN_COLS = 9;
+        final int MAX_MINES = 999;
+        final int MIN_MINES = 1;
+        final float MAX_PERCENT_MINES = 0.6f;
+
+        Object[] options = {"OK", "Randomize", "Cancel"};
+
+        JTextField rowsField = new JTextField(String.valueOf(game.getDimAndMines()[0]));
+        JTextField colsField = new JTextField(String.valueOf(game.getDimAndMines()[1]));
+        JTextField minesField = new JTextField(String.valueOf(game.getDimAndMines()[2]));
+
+        JPanel p = new JPanel();
+        p.setLayout(new GridLayout(3, 1));
+        p.add(new JLabel(String.format("Rows (max %d): ", MAX_ROWS)));
+        p.add(rowsField);
+        p.add(new JLabel(String.format("Columns (max %d): ", MAX_COLS)));
+        p.add(colsField);
+        p.add(new JLabel(String.format("Mines (max %.0f%%):", MAX_PERCENT_MINES * 100)));
+        p.add(minesField);
+
+        int select = JOptionPane.showOptionDialog(frame, p, "Custom", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+        switch (select) {
+            case 0: // OK
+                int[] dim;
+                try {
+                    dim = new int[]{Integer.parseInt(rowsField.getText()),
+                            Integer.parseInt(colsField.getText()), Integer.parseInt(minesField.getText())};
+                } catch (NumberFormatException e) {
+                    return; // if they insert a non-integer, get out
+                }
+
+                if (dim[0] >= 0 && dim[1] >= 0 && dim[2] >= 0) { // positive
+                    if (dim[2] < MIN_MINES) {
+                        dim[2] = MIN_MINES; // must have at least one mine
+                    } else {
+                        int cutOffMines = (int) (dim[0] * dim[1] * MAX_PERCENT_MINES);
+                        if (cutOffMines > MAX_MINES) {
+                            cutOffMines = MAX_MINES;
+                        }
+                        if (dim[2] > cutOffMines) {
+                            dim[2] = cutOffMines;
+                        }
+                    }
+
+                    if (dim[0] > MAX_ROWS) {
+                        dim[0] = MAX_ROWS;
+                    } else if (dim[0] < MIN_ROWS) {
+                        dim[0] = MIN_ROWS;
+                    }
+
+                    if (dim[1] > MAX_COLS) {
+                        dim[1] = MAX_COLS;
+                    } else if (dim[1] < MIN_COLS) {
+                        dim[1] = MIN_COLS;
+                    }
+                    resetNewDiff(dim[0], dim[1], dim[2]);
+                }
+                break;
+            case 1: // randomize
+                Random randy = new Random();
+                int rows = randy.nextInt(MAX_ROWS) + MIN_ROWS;
+                int cols = randy.nextInt(MAX_COLS - MIN_COLS + 1) + MIN_COLS;
+                int mines = randy.nextInt((int) (rows * cols * MAX_PERCENT_MINES) - 1) + MIN_MINES;
+                resetNewDiff(rows, cols, mines);
+                break;
+        }
+    }
+
+    /**
      * Reset game with the same difficulty as before.
      * Do this by creating a new Minesweeper object, and resetting timer and flags.
      * Note that we do not need to create a new Grid object:
@@ -179,7 +261,8 @@ public class MinesUI {
      */
     private void reset() {
         boolean marks = game.isMarkOption();
-        game = new Minesweeper(game.getDiff());
+        game = new Minesweeper(game.getDimAndMines()[0],
+                game.getDimAndMines()[1], game.getDimAndMines()[2]);
         game.setMarkOption(marks);
 
         flagger.updateFlags();
@@ -196,16 +279,15 @@ public class MinesUI {
 
     /**
      * Reset game with a new difficulty setting
-     * @param gameDiff new difficulty of game
      */
-    private void resetNewDiff(Minesweeper.Difficulty gameDiff) {
+    private void resetNewDiff(int rows, int cols, int mines) {
         // Don't do anything if we're already at that difficulty.
-        if (gameDiff == game.getDiff()) {
+        if (game.getDimAndMines()[0] == rows && game.getDimAndMines()[1] == cols && game.getDimAndMines()[2] == mines) {
             return;
         }
 
         boolean marks = game.isMarkOption();
-        game = new Minesweeper(gameDiff);
+        game = new Minesweeper(rows, cols, mines);
         game.setMarkOption(marks);
 
         frame.remove(grid);
@@ -345,8 +427,8 @@ public class MinesUI {
         private int rows;
         private int cols;
         Grid() {
-            rows = game.getDim()[0];
-            cols = game.getDim()[1];
+            rows = game.getDimAndMines()[0];
+            cols = game.getDimAndMines()[1];
             createBoard();
             this.setBackground(background);
             this.setBorder(new CompoundBorder(new EmptyBorder(5, 10, 10, 10),
@@ -483,6 +565,7 @@ public class MinesUI {
                     tileImg = loader.getTileSprite(1);
                 }
             }
+
             g2.drawImage(tileImg, 0, 0, loader.getTileDimensions()[0],
                     loader.getTileDimensions()[1], this);
         }

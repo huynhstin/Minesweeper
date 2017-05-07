@@ -39,16 +39,8 @@ class Cell {
         return value == EMPTY_VAL;
     }
 
-    void setEmpty() {
-        value = EMPTY_VAL;
-    }
-
     int getValue() {
         return value;
-    }
-
-    void setValue(int value) {
-        this.value = value;
     }
 
     /**
@@ -57,7 +49,7 @@ class Cell {
      *  stay flagged until un-flagged or until the game is won/lost.
      */
     void reveal() {
-        if (state != State.REVEALED && state != State.FLAGGED) {
+        if (state != State.FLAGGED) {
             state = State.REVEALED;
         }
     }
@@ -86,9 +78,9 @@ class Cell {
      * Increment the value of the cell, to be used when generating the board. <br>
      * Do not increment the cell if it is a mine.
      */
-    void increase(int amt) {
+    void increase() {
         if (value != MINE_VAL) {
-            this.value += amt;
+            this.value ++;
         }
     }
 

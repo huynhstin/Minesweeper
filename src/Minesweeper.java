@@ -7,10 +7,6 @@ import java.util.Random;
  */
 
 class Minesweeper {
-    enum Difficulty {
-        BEGINNER, INTERMEDIATE, EXPERT
-    }
-
     private int rows;
     private int cols;
     private int mines;
@@ -24,31 +20,15 @@ class Minesweeper {
     private final Random randy = new Random();
     private Cell lastClickedCell;
     private boolean markOption = false;
-    private final Difficulty diff;
 
     /* This list holds the coordinates of all the Cells that have changed
      state, to avoid having to repaint all of the Cells on each click. */
     private final ArrayList<int[]> toPaint = new ArrayList<>();
 
-    Minesweeper(Difficulty diff) {
-        this.diff = diff;
-        switch (diff) {
-            case BEGINNER:
-                rows = 9;
-                cols = 9;
-                mines = 10;
-                break;
-            case INTERMEDIATE:
-                rows = 16;
-                cols = 16;
-                mines = 40;
-                break;
-            case EXPERT:
-                rows = 16;
-                cols = 30;
-                mines = 99;
-                break;
-        }
+    Minesweeper(int rows, int cols, int mines) {
+        this.rows = rows;
+        this.cols = cols;
+        this.mines = mines;
         board = new Cell[rows][cols];
         mineLocations = new int[mines][2];
         fillBoard();
@@ -73,10 +53,6 @@ class Minesweeper {
         }
     }
 
-    Difficulty getDiff() {
-        return this.diff;
-    }
-
     Cell getPrevLastClicked() {
         return lastClickedCell;
     }
@@ -94,22 +70,22 @@ class Minesweeper {
                 board[r][c] = new Cell();
             }
         }
-        generate(this.mines);
     }
 
     /**
      * Generates random coordinates to place mines in, and saves the locations
      *  of those mines to the mineLocations array.
      * @param num how many mines to generate.
+     * @param ignore the coordinates of the cell to not generate a mine at
      */
-    private void generate(int num) {
+    private void generate(int num, int[] ignore) {
         int minesLeft = num;
         while (minesLeft > 0) {
             int r = randy.nextInt(rows);
             int c = randy.nextInt(cols);
-            if (!board[r][c].isMine()) {
+            if (!board[r][c].isMine() && r != ignore[0] && c != ignore[1]) {
                 board[r][c].makeMine();
-                incrSurround(r, c, 1);
+                incrSurround(r, c);
                 mineLocations[minesLeft - 1] = new int[]{r, c};
                 minesLeft--;
             }
@@ -120,28 +96,26 @@ class Minesweeper {
      * Increment all the cells around a given coordinate
      * @param r row
      * @param c col
-     * @param amt how much to increase by
      */
-    private void incrSurround(int r, int c, int amt) {
-        incrCell(r + 1, c, amt);
-        incrCell(r - 1, c, amt);
-        incrCell(r, c + 1, amt);
-        incrCell(r, c - 1, amt);
-        incrCell(r + 1, c + 1, amt);
-        incrCell(r - 1, c - 1, amt);
-        incrCell(r + 1, c - 1, amt);
-        incrCell(r - 1, c + 1, amt);
+    private void incrSurround(int r, int c) {
+        incrCell(r + 1, c);
+        incrCell(r - 1, c);
+        incrCell(r, c + 1);
+        incrCell(r, c - 1);
+        incrCell(r + 1, c + 1);
+        incrCell(r - 1, c - 1);
+        incrCell(r + 1, c - 1);
+        incrCell(r - 1, c + 1);
     }
 
     /**
      * Increment the cell at the given coordinate
      * @param r row
      * @param c col
-     * @param amt how much to increase by
      */
-    private void incrCell(int r, int c, int amt) {
+    private void incrCell(int r, int c) {
         if (inBound(r, c)) {
-            board[r][c].increase(amt);
+            board[r][c].increase();
         }
     }
 
@@ -157,8 +131,8 @@ class Minesweeper {
         return this.dead;
     }
 
-    int[] getDim() {
-        return new int[] {this.rows, this.cols};
+    int[] getDimAndMines() {
+        return new int[] {this.rows, this.cols, this.mines};
     }
 
     /**
@@ -173,15 +147,10 @@ class Minesweeper {
             if (inBound(r, c) && (board[r][c].getState() == Cell.State.HIDDEN ||
                                        board[r][c].getState() == Cell.State.MARKED)) {
 
-                /* If you hit a mine on the first move, call the firstMoveDeath method
-                 and recursively call this method without checking for mines. */
+                // Generate the board on the first move, avoiding the first cell clicked
                 if (!madeFirstMove) {
                     madeFirstMove = true;
-                    if (board[r][c].isMine()) {
-                        firstMoveDeath(r, c);
-                        move(r, c, false);
-                        return;
-                    }
+                    generate(this.mines, new int[] {r, c});
                 }
 
                 if (!board[r][c].isMine()) { // reveal it, since it was hidden. do not reveal mines
@@ -207,78 +176,6 @@ class Minesweeper {
                 }
             }
         }
-    }
-
-    /**
-     * Prevents first move deaths (hitting a mine on your first click).
-     * <P> Process: <br> Finds the location of that mine in the mineLocations array,
-     *  then generates a new mine in a random location. <br> Then, put the new mine's
-     *  coordinates at the index that the old mine used to occupy in the mineLocations array. <br>
-     *      Set the mine that was clicked to empty and update its value, and finally
-     *      decrement all the cells around the cell, to reflect the mine removal. </P>
-     * @param r row
-     * @param c col
-     */
-    private void firstMoveDeath(int r, int c) {
-        // mineLocations is saved as [numberOfMines][coordinates]
-        // need to search for the index of where the current mine is saved, so we can remove it
-        int locInArr = 0;
-        int count = 0;
-        for (int[] mineCoords : mineLocations) {
-            if (mineCoords[0] == r && mineCoords[1] == c) {
-                locInArr = count;
-            }
-            count++;
-        }
-
-        // Modified version of generate method
-        // Don't make current one empty until we generate, so it knows not to generate it at the current index
-        while (true) { // go until we break
-            int i = randy.nextInt(this.rows);
-            int j = randy.nextInt(this.cols);
-            if (!board[i][j].isMine() && board[i][j].isEmpty()) {
-                board[i][j].makeMine();
-                incrSurround(i, j, 1);
-                mineLocations[locInArr] = new int[]{i, j}; // replace the old mine location with the new one
-                break;
-            }
-        }
-
-        board[r][c].setEmpty(); // make current one empty for now
-        updateValOnNotMine(r, c); // update the value of it (if there are mines nearby)
-        incrSurround(r, c, -1); // decrement the surrounding to reflect mine removal
-    }
-
-    /**
-     * When the first clicked cell is a mine, we set it empty and regenerate a new one. <br>
-     * So, we need to update its value if there are mines around it.
-     * @param r row
-     * @param c col
-     */
-    private void updateValOnNotMine(int r, int c) {
-        int val = 0;
-        val += isMineAtCoord(r + 1, c);
-        val += isMineAtCoord(r - 1, c);
-        val += isMineAtCoord(r, c + 1);
-        val += isMineAtCoord(r, c - 1);
-        val += isMineAtCoord(r + 1, c + 1);
-        val += isMineAtCoord(r - 1, c - 1);
-        val += isMineAtCoord(r + 1, c - 1);
-        val += isMineAtCoord(r - 1, c + 1);
-        board[r][c].setValue(val);
-    }
-
-    /**
-     * If there is a mine at that location, return 1; else return 0
-     * @param r row
-     * @param c col
-     * @return number to update value by
-     */
-    private int isMineAtCoord(int r, int c) {
-        if (inBound(r, c) && board[r][c].isMine()) {
-            return 1;
-        }
-        return 0;
     }
 
     ArrayList<int[]> getToPaint() {
@@ -334,13 +231,5 @@ class Minesweeper {
 
     boolean isMarkOption() {
         return markOption;
-    }
-
-    int getRows() {
-        return rows;
-    }
-
-    int getCols() {
-        return cols;
     }
 }
