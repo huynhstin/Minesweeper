@@ -83,7 +83,7 @@ class Minesweeper {
         while (minesLeft > 0) {
             int r = randy.nextInt(rows);
             int c = randy.nextInt(cols);
-            if (!board[r][c].isMine() && r != ignore[0] && c != ignore[1]) {
+            if (!board[r][c].isMine() && (r != ignore[0] && c != ignore[1])) {
                 board[r][c].makeMine();
                 incrSurround(r, c);
                 mineLocations[minesLeft - 1] = new int[]{r, c};
@@ -221,15 +221,11 @@ class Minesweeper {
         }
     }
 
-    void toggleMarkOption() {
-        this.markOption = !this.markOption;
-    }
-
     void setMarkOption(boolean markOption) {
         this.markOption = markOption;
     }
 
-    boolean isMarkOption() {
+    boolean getMarkOption() {
         return markOption;
     }
 }

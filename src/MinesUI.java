@@ -98,7 +98,7 @@ public class MinesUI {
         separatorTwo.setPreferredSize(new Dimension(0, 1));
 
         JCheckBoxMenuItem marksOn = new JCheckBoxMenuItem("Marks (?)");
-        marksOn.addActionListener(e -> game.toggleMarkOption());
+        marksOn.addActionListener(e -> game.setMarkOption(!game.getMarkOption()));
         marksOn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SLASH, 0));
 
         JSeparator separatorThree = new JSeparator();
@@ -181,7 +181,7 @@ public class MinesUI {
      */
     private void showCustomSizer() {
         final int MAX_ROWS = 45;
-        final int MIN_ROWS = 1;
+        final int MIN_ROWS = 3;
         final int MAX_COLS = 45;
         final int MIN_COLS = 9;
         final int MAX_MINES = 999;
@@ -248,6 +248,9 @@ public class MinesUI {
                 int rows = randy.nextInt(MAX_ROWS) + MIN_ROWS;
                 int cols = randy.nextInt(MAX_COLS - MIN_COLS + 1) + MIN_COLS;
                 int mines = randy.nextInt((int) (rows * cols * MAX_PERCENT_MINES) - 1) + MIN_MINES;
+                if (mines > MAX_MINES) {
+                    mines = MAX_MINES;
+                }
                 resetNewDiff(rows, cols, mines);
                 break;
         }
@@ -260,7 +263,7 @@ public class MinesUI {
      *      we only have to update its sprites since the dimensions will remain the same.
      */
     private void reset() {
-        boolean marks = game.isMarkOption();
+        boolean marks = game.getMarkOption();
         game = new Minesweeper(game.getDimAndMines()[0],
                 game.getDimAndMines()[1], game.getDimAndMines()[2]);
         game.setMarkOption(marks);
@@ -286,7 +289,7 @@ public class MinesUI {
             return;
         }
 
-        boolean marks = game.isMarkOption();
+        boolean marks = game.getMarkOption();
         game = new Minesweeper(rows, cols, mines);
         game.setMarkOption(marks);
 
